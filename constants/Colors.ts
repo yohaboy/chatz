@@ -1,19 +1,25 @@
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+const tintColorLight = '#008B8B'; // Professional Cyan
+const tintColorDark = '#4DD0E1';
 
 export default {
   light: {
-    text: '#000',
-    background: '#fff',
+    text: '#000000',
+    background: '#FAFDFF', // Whitish Cyan
     tint: tintColorLight,
-    tabIconDefault: '#ccc',
+    tabIconDefault: '#90A4AE',
     tabIconSelected: tintColorLight,
+    secondary: '#E0F7FA',
+    border: '#B2EBF2',
+    accent: '#006064',
   },
   dark: {
-    text: '#fff',
-    background: '#000',
+    text: '#FFFFFF',
+    background: '#001A1A',
     tint: tintColorDark,
-    tabIconDefault: '#ccc',
+    tabIconDefault: '#546E7A',
     tabIconSelected: tintColorDark,
+    secondary: '#004D40',
+    border: '#00838F',
+    accent: '#80DEEA',
   },
 };
