@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Send } from 'lucide-react-native';
+import { ArrowLeft, Bot, Send } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
@@ -12,7 +12,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { getMessages, sendMessage } from '../../../api/chats';
+import { getChatDetails, getMessages, sendMessage } from '../../../api/chats';
 import Colors from '../../../constants/Colors';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -20,6 +20,7 @@ export default function ChatDetailScreen() {
     const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
     const { user } = useAuth();
     const router = useRouter();
+    const [chat, setChat] = useState<any>(null);
     const [messages, setMessages] = useState<any[]>([]);
     const [inputText, setInputText] = useState('');
     const [loading, setLoading] = useState(true);
@@ -27,11 +28,21 @@ export default function ChatDetailScreen() {
     const flatListRef = useRef<FlatList>(null);
 
     useEffect(() => {
+        loadChatDetails();
         loadMessages();
         // Optional: Poll for new messages every 5 seconds since we don't have WebSocket here yet
         const interval = setInterval(loadMessages, 5000);
         return () => clearInterval(interval);
     }, [id]);
+
+    async function loadChatDetails() {
+        try {
+            const response = await getChatDetails(id!);
+            setChat(response.data);
+        } catch (error) {
+            console.error('Failed to load chat details', error);
+        }
+    }
 
     async function loadMessages() {
         try {
@@ -66,19 +77,35 @@ export default function ChatDetailScreen() {
     };
 
     const renderMessage = ({ item }: { item: any }) => {
-        // Assuming your backend message model has 'sender_id' or 'is_me' or similar
-        // Adjust these keys based on your actual backend response
         const isMe = item.sender_user_id === user?.id || item.is_user_message;
+        const isGroup = chat?.chat_type?.toLowerCase() === 'group';
+
+        // Find agent info if it's not me in a group chat
+        let agentName = '';
+        if (isGroup && !isMe) {
+            const participant = chat?.participants?.find((p: any) => p.agent_id === item.sender_agent_id);
+            agentName = participant?.agent_name || 'Agent';
+        }
 
         return (
             <View style={[styles.messageRow, isMe ? styles.myMessageRow : styles.theirMessageRow]}>
-                <View style={[styles.messageBubble, isMe ? styles.myBubble : styles.theirBubble]}>
-                    <Text style={[styles.messageText, isMe ? styles.myMessageText : styles.theirMessageText]}>
-                        {item.content || item.text}
-                    </Text>
-                    <Text style={styles.timestamp}>
-                        {new Date(item.created_at || item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </Text>
+                {isGroup && !isMe && (
+                    <View style={styles.senderAvatar}>
+                        <Bot size={16} color={Colors.light.tint} />
+                    </View>
+                )}
+                <View style={[styles.messageBubbleContainer, isMe ? styles.myBubbleContainer : styles.theirBubbleContainer]}>
+                    {isGroup && !isMe && (
+                        <Text style={styles.senderName}>{agentName}</Text>
+                    )}
+                    <View style={[styles.messageBubble, isMe ? styles.myBubble : styles.theirBubble]}>
+                        <Text style={[styles.messageText, isMe ? styles.myMessageText : styles.theirMessageText]}>
+                            {item.content || item.text}
+                        </Text>
+                        <Text style={styles.timestamp}>
+                            {new Date(item.created_at || item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </Text>
+                    </View>
                 </View>
             </View>
         );
@@ -253,5 +280,32 @@ const styles = StyleSheet.create({
     },
     sendButtonDisabled: {
         backgroundColor: '#B2DFDB',
+    },
+    senderAvatar: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: Colors.light.secondary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
+        alignSelf: 'flex-end',
+        marginBottom: 4,
+    },
+    messageBubbleContainer: {
+        maxWidth: '80%',
+    },
+    myBubbleContainer: {
+        alignItems: 'flex-end',
+    },
+    theirBubbleContainer: {
+        alignItems: 'flex-start',
+    },
+    senderName: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#546E7A',
+        marginLeft: 4,
+        marginBottom: 2,
     },
 });
