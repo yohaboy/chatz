@@ -36,8 +36,10 @@ export default function ChatDetailScreen() {
     async function loadMessages() {
         try {
             const response = await getMessages(id!);
-            // Sort messages by timestamp if needed, backend usually returns them in order
-            setMessages(response.data);
+            // Backend returns messages in descending order (newest first)
+            // Reverse them to show newest at bottom of FlatList
+            const messages = response.data.messages || [];
+            setMessages([...messages].reverse());
         } catch (error) {
             console.error('Failed to load messages', error);
         } finally {
@@ -66,7 +68,7 @@ export default function ChatDetailScreen() {
     const renderMessage = ({ item }: { item: any }) => {
         // Assuming your backend message model has 'sender_id' or 'is_me' or similar
         // Adjust these keys based on your actual backend response
-        const isMe = item.sender_id === user?.id || item.is_user_message;
+        const isMe = item.sender_user_id === user?.id || item.is_user_message;
 
         return (
             <View style={[styles.messageRow, isMe ? styles.myMessageRow : styles.theirMessageRow]}>
