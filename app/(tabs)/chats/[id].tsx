@@ -120,7 +120,7 @@ export default function ChatDetailScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <ArrowLeft color="#000" size={24} />
+                    <ArrowLeft color="#FFF" size={24} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -200,17 +200,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     header: {
-        height: 100,
-        paddingTop: Platform.OS === 'ios' ? 50 : 30,
+        paddingTop: 60,
         paddingHorizontal: 20,
-        backgroundColor: '#FFF',
         flexDirection: 'row',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.light.border,
+        backgroundColor: Colors.light.tint,
+        paddingBottom: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4,
     },
     backButton: {
-        marginRight: 15,
+        marginRight: 10,
     },
     headerInfo: {
         flex: 1,
@@ -218,11 +221,11 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#000',
+        color: '#FFF',
     },
     headerStatus: {
         fontSize: 12,
-        color: '#546E7A',
+        color: '#E0F2F1', // Light shade for the status
     },
     headerInfoContainer: {
         flex: 1,
@@ -233,7 +236,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: Colors.light.secondary,
+        backgroundColor: '#FFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,

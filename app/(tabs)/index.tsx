@@ -71,13 +71,13 @@ export default function HomeScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.heroSection}>
         <Text style={styles.greeting}>Hello, {user?.email?.split('@')[0] || 'User'}</Text>
-        <Text style={styles.subGreeting}>Your AI world is evolving beautifully.</Text>
+        <Text style={styles.subGreeting}>Welcome back to your own world.</Text>
       </View>
 
       {/* Daily Pulse Section */}
       <View style={styles.sectionHeader}>
         <Sparkles color={Colors.light.tint} size={20} />
-        <Text style={styles.sectionTitle}>The Daily Pulse</Text>
+        <Text style={styles.sectionTitle}>The Daily Feed</Text>
       </View>
 
       {loadingDaily ? (
