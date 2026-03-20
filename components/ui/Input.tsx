@@ -1,32 +1,35 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextInput, TextInputProps, TextStyle, View, ViewStyle } from 'react-native';
+import Colors from '../../constants/Colors';
+import { useTheme } from '../../context/ThemeContext';
 
-interface InputProps {
+interface InputProps extends TextInputProps {
     label?: string;
     error?: string;
     containerStyle?: ViewStyle;
-    inputStyle?: ViewStyle;
-    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-    autoCorrect?: boolean;
-    secureTextEntry?: boolean;
-    placeholder?: string;
-    onChangeText?: (text: string) => void;
-    value?: string;
-    keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+    inputStyle?: TextStyle;
 }
 
 export function Input(props: InputProps) {
     const { label, error, containerStyle, inputStyle, ...rest } = props;
+    const { colorScheme } = useTheme();
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
+
     return (
         <View style={[styles.container, containerStyle]}>
-            {label && <Text style={styles.label}>{label}</Text>}
+            {label && <Text style={[styles.label, { color: isDark ? '#B0BEC5' : '#333' }]}>{label}</Text>}
             <TextInput
                 style={[
                     styles.input,
-                    error ? styles.errorInput : styles.normalInput,
+                    {
+                        backgroundColor: isDark ? '#002626' : '#FFFFFF',
+                        color: themeColors.text,
+                        borderColor: error ? '#E53935' : (isDark ? '#004D40' : '#CFD8DC')
+                    },
                     inputStyle
                 ]}
-                placeholderTextColor="#90A4AE"
+                placeholderTextColor={isDark ? '#546E7A' : '#90A4AE'}
                 {...rest}
             />
             {error && <Text style={styles.errorText}>{error}</Text>}
@@ -41,7 +44,6 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#333',
         marginBottom: 6,
         fontWeight: '500',
     },
@@ -51,14 +53,6 @@ const styles = StyleSheet.create({
         borderRadius: 2,
         paddingHorizontal: 12,
         fontSize: 16,
-        color: '#000',
-        backgroundColor: '#FFFFFF',
-    },
-    normalInput: {
-        borderColor: '#CFD8DC',
-    },
-    errorInput: {
-        borderColor: '#E53935',
     },
     errorText: {
         color: '#E53935',

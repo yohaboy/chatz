@@ -14,7 +14,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         headerShown: true,
         headerStyle: {
-          backgroundColor: Colors.light.tint,
+          backgroundColor: Colors[colorScheme].tint,
           elevation: 4,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },

@@ -6,12 +6,17 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import { getMyAgents } from '../../api/agents';
 import Colors from '../../constants/Colors';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const { colorScheme } = useTheme();
   const [agents, setAgents] = useState<any[]>([]);
   const [dailyData, setDailyData] = useState<any>(null);
   const [loadingDaily, setLoadingDaily] = useState(true);
+
+  const isDark = colorScheme === 'dark';
+  const themeColors = isDark ? Colors.dark : Colors.light;
 
   useEffect(() => {
     loadAgents();
@@ -68,55 +73,64 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.heroSection}>
-        <Text style={styles.greeting}>Hello, {user?.email?.split('@')[0] || 'User'}</Text>
-        <Text style={styles.subGreeting}>Welcome back to your own world.</Text>
+    <ScrollView style={[styles.container, { backgroundColor: themeColors.background }]} contentContainerStyle={styles.content}>
+      <View style={[styles.heroSection, { borderBottomColor: themeColors.border }]}>
+        <Text style={[styles.greeting, { color: themeColors.text }]}>Hello, {user?.email?.split('@')[0] || 'User'}</Text>
+        <Text style={[styles.subGreeting, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Welcome back to your own world.</Text>
       </View>
 
       {/* Daily Pulse Section */}
       <View style={styles.sectionHeader}>
-        <Sparkles color={Colors.light.tint} size={20} />
-        <Text style={styles.sectionTitle}>The Daily Feed</Text>
+        <Sparkles color={themeColors.tint} size={20} />
+        <Text style={[styles.sectionTitle, { color: isDark ? themeColors.tint : '#333' }]}>The Daily Feed</Text>
       </View>
 
       {loadingDaily ? (
         <View style={styles.loadingPulse}>
-          <ActivityIndicator color={Colors.light.tint} />
+          <ActivityIndicator color={themeColors.tint} />
         </View>
       ) : (
         <View style={styles.pulseContainer}>
           {/* Card 1: Joke */}
-          <View style={[styles.pulseCard, { borderColor: '#FFF176', backgroundColor: '#FFFDE7' }]}>
+          <View style={[styles.pulseCard, {
+            borderColor: isDark ? '#FBC02D' : '#FFF176',
+            backgroundColor: isDark ? '#1A1A00' : '#FFFDE7'
+          }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconBox, { backgroundColor: '#FBC02D' }]}>
                 <MessageSquare color="#FFF" size={18} />
               </View>
-              <Text style={styles.cardTitle}>Daily Laugh</Text>
+              <Text style={[styles.cardTitle, { color: isDark ? themeColors.text : '#333' }]}>Daily Laugh</Text>
             </View>
-            <Text style={styles.cardText}>{dailyData?.joke}</Text>
+            <Text style={[styles.cardText, { color: isDark ? '#ECEFF1' : '#263238' }]}>{dailyData?.joke}</Text>
           </View>
 
           {/* Card 2: Fact */}
-          <View style={[styles.pulseCard, { borderColor: '#81D4FA', backgroundColor: '#E1F5FE' }]}>
+          <View style={[styles.pulseCard, {
+            borderColor: isDark ? '#0288D1' : '#81D4FA',
+            backgroundColor: isDark ? '#001320' : '#E1F5FE'
+          }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconBox, { backgroundColor: '#0288D1' }]}>
                 <Lightbulb color="#FFF" size={18} />
               </View>
-              <Text style={styles.cardTitle}>Daily Fact</Text>
+              <Text style={[styles.cardTitle, { color: isDark ? themeColors.text : '#333' }]}>Daily Fact</Text>
             </View>
-            <Text style={styles.cardText}>{dailyData?.fact}</Text>
+            <Text style={[styles.cardText, { color: isDark ? '#ECEFF1' : '#263238' }]}>{dailyData?.fact}</Text>
           </View>
 
           {/* Card 3: Advice */}
-          <View style={[styles.pulseCard, { borderColor: '#A5D6A7', backgroundColor: '#E8F5E9' }]}>
+          <View style={[styles.pulseCard, {
+            borderColor: isDark ? '#388E3C' : '#A5D6A7',
+            backgroundColor: isDark ? '#001A00' : '#E8F5E9'
+          }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconBox, { backgroundColor: '#388E3C' }]}>
                 <Compass color="#FFF" size={18} />
               </View>
-              <Text style={styles.cardTitle}>Daily Advice</Text>
+              <Text style={[styles.cardTitle, { color: isDark ? themeColors.text : '#333' }]}>Daily Advice</Text>
             </View>
-            <Text style={styles.cardText}>{dailyData?.advice}</Text>
+            <Text style={[styles.cardText, { color: isDark ? '#ECEFF1' : '#263238' }]}>{dailyData?.advice}</Text>
           </View>
         </View>
       )}
@@ -127,7 +141,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   content: {
     padding: 20,
@@ -135,17 +148,14 @@ const styles = StyleSheet.create({
   heroSection: {
     paddingVertical: 30,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
     marginBottom: 24,
   },
   greeting: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#000',
   },
   subGreeting: {
     fontSize: 16,
-    color: '#546E7A',
     marginTop: 6,
   },
   sectionHeader: {
@@ -158,7 +168,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#333',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -173,9 +182,9 @@ const styles = StyleSheet.create({
   },
   pulseCard: {
     padding: 20,
-    borderRadius: 2, // Keeping the user's preferred square style
+    borderRadius: 2,
     borderWidth: 1,
-    borderLeftWidth: 6, // Thick left accent for "modern-meets-fixed" look
+    borderLeftWidth: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -195,113 +204,11 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#333',
     textTransform: 'uppercase',
   },
   cardText: {
     fontSize: 15,
-    color: '#263238',
     lineHeight: 22,
     fontWeight: '500',
-  },
-  agentsGrid: {
-    marginBottom: 30,
-  },
-  agentCard: {
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: '#ECEFF1',
-    borderRadius: 2,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  agentIcon: {
-    width: 64,
-    height: 64,
-    backgroundColor: Colors.light.secondary,
-    borderRadius: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-    position: 'relative',
-  },
-  statusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    borderWidth: 2,
-    borderColor: '#FFF',
-  },
-  agentName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000',
-  },
-  agentInfo: {
-    fontSize: 14,
-    color: '#546E7A',
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  chatBtn: {
-    width: '100%',
-    height: 40,
-    backgroundColor: Colors.light.tint,
-    borderRadius: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  chatBtnText: {
-    color: '#FFF',
-    fontWeight: '600',
-  },
-  emptyState: {
-    padding: 40,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-    borderStyle: 'dashed',
-    borderRadius: 2,
-    marginBottom: 30,
-  },
-  emptyText: {
-    color: '#90A4AE',
-    textAlign: 'center',
-  },
-  statsSection: {
-    gap: 16,
-    marginBottom: 100,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  statItem: {
-    flex: 1,
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: '#ECEFF1',
-    padding: 16,
-    borderRadius: 2,
-    alignItems: 'center',
-  },
-  statVal: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
-    marginTop: 8,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#546E7A',
-    marginTop: 2,
   },
 });

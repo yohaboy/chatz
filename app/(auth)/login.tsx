@@ -8,15 +8,20 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import Colors from '../../constants/Colors';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
     const router = useRouter();
     const { signIn } = useAuth();
+    const { colorScheme } = useTheme();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
@@ -32,7 +37,7 @@ export default function LoginScreen() {
             const response = await login({ email, password });
             const { access_token } = response.data;
             if (access_token) {
-                await signIn(access_token, response.data.user); // pass user if exists, though it likely doesn't
+                await signIn(access_token, response.data.user);
                 router.replace('/(tabs)');
             } else {
                 throw new Error('No access token received');
@@ -49,9 +54,6 @@ export default function LoginScreen() {
             const result = await promptAsync();
             if (result.type === 'success') {
                 const { authentication } = result;
-                // Verify token with backend
-                // const response = await verifyGoogleToken(authentication.accessToken);
-                // signIn(token, user);
                 router.replace('/(tabs)');
             }
         } catch (error) {
@@ -60,14 +62,14 @@ export default function LoginScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: themeColors.background }]}>
             <View style={styles.content}>
                 <View style={styles.logoContainer}>
-                    <View style={styles.logo}>
+                    <View style={[styles.logo, { backgroundColor: themeColors.tint }]}>
                         <Text style={styles.logoText}>CZ</Text>
                     </View>
-                    <Text style={styles.title}>Welcome Back</Text>
-                    <Text style={styles.subtitle}>Sign in to continue</Text>
+                    <Text style={[styles.title, { color: themeColors.text }]}>Welcome Back</Text>
+                    <Text style={[styles.subtitle, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Sign in to continue</Text>
                 </View>
 
                 <Input
@@ -87,30 +89,30 @@ export default function LoginScreen() {
                 />
 
                 <TouchableOpacity style={styles.forgotPass}>
-                    <Text style={styles.forgotText}>Forgot Password?</Text>
+                    <Text style={[styles.forgotText, { color: themeColors.tint }]}>Forgot Password?</Text>
                 </TouchableOpacity>
 
                 <Button title="Sign In" onPress={handleLogin} disabled={loading} />
 
                 <View style={styles.divider}>
-                    <View style={styles.line} />
+                    <View style={[styles.line, { backgroundColor: isDark ? '#003333' : '#ECEFF1' }]} />
                     <Text style={styles.dividerText}>OR</Text>
-                    <View style={styles.line} />
+                    <View style={[styles.line, { backgroundColor: isDark ? '#003333' : '#ECEFF1' }]} />
                 </View>
 
                 <TouchableOpacity
-                    style={styles.googleButton}
+                    style={[styles.googleButton, { backgroundColor: isDark ? '#002626' : '#fff', borderColor: isDark ? '#004D40' : '#CFD8DC' }]}
                     onPress={handleGoogleLogin}
                     disabled={!request}
                 >
-                    <Text style={styles.googleButtonText}>Continue with Google</Text>
+                    <Text style={[styles.googleButtonText, { color: themeColors.text }]}>Continue with Google</Text>
                 </TouchableOpacity>
 
                 <View style={styles.footer}>
-                    <Text style={styles.footerText}>Don't have an account? </Text>
+                    <Text style={[styles.footerText, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Don't have an account? </Text>
                     <Link href="/(auth)/signup" asChild>
                         <TouchableOpacity>
-                            <Text style={styles.signupLink}>Sign Up</Text>
+                            <Text style={[styles.signupLink, { color: themeColors.tint }]}>Sign Up</Text>
                         </TouchableOpacity>
                     </Link>
                 </View>
@@ -122,7 +124,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
         justifyContent: 'center',
         padding: 24,
     },
@@ -136,7 +137,6 @@ const styles = StyleSheet.create({
     logo: {
         width: 64,
         height: 64,
-        backgroundColor: Colors.light.tint,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 2,
@@ -150,11 +150,9 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#000',
     },
     subtitle: {
         fontSize: 16,
-        color: '#546E7A',
         marginTop: 4,
     },
     forgotPass: {
@@ -162,7 +160,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     forgotText: {
-        color: Colors.light.tint,
         fontWeight: '600',
         fontSize: 14,
     },
@@ -174,7 +171,6 @@ const styles = StyleSheet.create({
     line: {
         flex: 1,
         height: 1,
-        backgroundColor: '#ECEFF1',
     },
     dividerText: {
         marginHorizontal: 16,
@@ -185,15 +181,12 @@ const styles = StyleSheet.create({
     googleButton: {
         height: 48,
         borderWidth: 1,
-        borderColor: '#CFD8DC',
         borderRadius: 2,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 24,
     },
     googleButtonText: {
-        color: '#333',
         fontWeight: '600',
         fontSize: 16,
     },
@@ -203,11 +196,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     footerText: {
-        color: '#546E7A',
         fontSize: 14,
     },
     signupLink: {
-        color: Colors.light.tint,
         fontWeight: '700',
         fontSize: 14,
     },

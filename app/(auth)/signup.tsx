@@ -8,13 +8,18 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import Colors from '../../constants/Colors';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function SignupScreen() {
     const router = useRouter();
     const { signIn } = useAuth();
+    const { colorScheme } = useTheme();
     const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [templates, setTemplates] = useState<any[]>([]);
+
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
 
     // Form State
     const [userInfo, setUserInfo] = useState({
@@ -44,7 +49,6 @@ export default function SignupScreen() {
             const response = await getAgentTemplates();
             setTemplates(response.data);
         } catch (error) {
-            // For demo purposes if API doesn't exist yet, we'll use fallback
             setTemplates([
                 { id: '1', name: 'Alpha Agent', description: 'A reliable assistant' },
                 { id: '2', name: 'Beta Bot', description: 'A funny companion' },
@@ -67,7 +71,6 @@ export default function SignupScreen() {
                 Alert.alert('Selection Required', 'Please select an agent template');
                 return;
             }
-            // Initialize agent name from template
             setAgentCustomization({
                 ...agentCustomization,
                 name: selectedTemplate.name,
@@ -104,7 +107,6 @@ export default function SignupScreen() {
             }
         } catch (error) {
             Alert.alert('Signup Failed', 'Something went wrong. Please try again.');
-            // router.replace('/(tabs)'); // Fallback for demo
         } finally {
             setLoading(false);
         }
@@ -112,7 +114,7 @@ export default function SignupScreen() {
 
     const renderStep0User = () => (
         <View>
-            <Text style={styles.stepTitle}>Create Profile</Text>
+            <Text style={[styles.stepTitle, { color: themeColors.text }]}>Create Profile</Text>
             <Input
                 label="Email"
                 placeholder="Enter your email"
@@ -138,19 +140,27 @@ export default function SignupScreen() {
                     containerStyle={{ flex: 1 }}
                 />
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Gender</Text>
+                    <Text style={[styles.label, { color: isDark ? '#B0BEC5' : '#333' }]}>Gender</Text>
                     <View style={styles.genderContainer}>
                         <TouchableOpacity
-                            style={[styles.genderBox, userInfo.gender === 'male' && styles.genderActive]}
+                            style={[
+                                styles.genderBox,
+                                { borderColor: isDark ? '#004D40' : '#CFD8DC' },
+                                userInfo.gender === 'male' && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
+                            ]}
                             onPress={() => setUserInfo({ ...userInfo, gender: 'male' })}
                         >
-                            <Text style={[styles.genderText, userInfo.gender === 'male' && styles.genderTextActive]}>Male</Text>
+                            <Text style={[styles.genderText, userInfo.gender === 'male' && { color: themeColors.tint, fontWeight: '600' }]}>Male</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.genderBox, userInfo.gender === 'female' && styles.genderActive]}
+                            style={[
+                                styles.genderBox,
+                                { borderColor: isDark ? '#004D40' : '#CFD8DC' },
+                                userInfo.gender === 'female' && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
+                            ]}
                             onPress={() => setUserInfo({ ...userInfo, gender: 'female' })}
                         >
-                            <Text style={[styles.genderText, userInfo.gender === 'female' && styles.genderTextActive]}>Female</Text>
+                            <Text style={[styles.genderText, userInfo.gender === 'female' && { color: themeColors.tint, fontWeight: '600' }]}>Female</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -160,20 +170,24 @@ export default function SignupScreen() {
 
     const renderStep1Template = () => (
         <View>
-            <Text style={styles.stepTitle}>Select AI Template</Text>
-            <Text style={styles.stepSub}>Choose a base persona for your agent</Text>
+            <Text style={[styles.stepTitle, { color: themeColors.text }]}>Select AI Template</Text>
+            <Text style={[styles.stepSub, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Choose a base persona for your agent</Text>
             <ScrollView contentContainerStyle={styles.templateList}>
                 {templates.map((t: any) => (
                     <TouchableOpacity
                         key={t.id}
-                        style={[styles.templateCard, selectedTemplate?.id === t.id && styles.templateCardActive]}
+                        style={[
+                            styles.templateCard,
+                            { borderColor: isDark ? '#004D40' : '#CFD8DC', backgroundColor: isDark ? '#002626' : 'transparent' },
+                            selectedTemplate?.id === t.id && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
+                        ]}
                         onPress={() => setSelectedTemplate(t)}
                     >
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.templateName}>{t.name}</Text>
-                            <Text style={styles.templateDesc}>{t.description}</Text>
+                            <Text style={[styles.templateName, { color: themeColors.text }]}>{t.name}</Text>
+                            <Text style={[styles.templateDesc, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>{t.description}</Text>
                         </View>
-                        {selectedTemplate?.id === t.id && <Check size={20} color={Colors.light.tint} />}
+                        {selectedTemplate?.id === t.id && <Check size={20} color={themeColors.tint} />}
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -182,7 +196,7 @@ export default function SignupScreen() {
 
     const renderStep2Agent = () => (
         <View>
-            <Text style={styles.stepTitle}>Customize Agent</Text>
+            <Text style={[styles.stepTitle, { color: themeColors.text }]}>Customize Agent</Text>
             <Input
                 label="Agent Name"
                 placeholder="Agent's name"
@@ -196,15 +210,19 @@ export default function SignupScreen() {
                 onChangeText={(text) => setAgentCustomization({ ...agentCustomization, age: text })}
                 keyboardType="numeric"
             />
-            <Text style={styles.label}>Personality</Text>
+            <Text style={[styles.label, { color: isDark ? '#B0BEC5' : '#333' }]}>Personality</Text>
             <View style={styles.personalityGrid}>
                 {(['romantic', 'friend', 'emotional'] as const).map((p) => (
                     <TouchableOpacity
                         key={p}
-                        style={[styles.pBox, agentCustomization.personality === p && styles.pBoxActive]}
+                        style={[
+                            styles.pBox,
+                            { borderColor: isDark ? '#004D40' : '#CFD8DC', backgroundColor: isDark ? '#002626' : 'transparent' },
+                            agentCustomization.personality === p && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
+                        ]}
                         onPress={() => setAgentCustomization({ ...agentCustomization, personality: p })}
                     >
-                        <Text style={[styles.pText, agentCustomization.personality === p && styles.pTextActive]}>
+                        <Text style={[styles.pText, agentCustomization.personality === p && { color: themeColors.tint, fontWeight: '600' }]}>
                             {p.charAt(0).toUpperCase() + p.slice(1)}
                         </Text>
                     </TouchableOpacity>
@@ -214,15 +232,15 @@ export default function SignupScreen() {
     );
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: themeColors.background }]}>
             <View style={styles.header}>
                 {step > 0 && (
                     <TouchableOpacity onPress={() => setStep(step - 1)}>
-                        <ChevronLeft color="#000" />
+                        <ChevronLeft color={themeColors.text} />
                     </TouchableOpacity>
                 )}
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressIndicator, { width: `${((step + 1) / 3) * 100}%` }]} />
+                <View style={[styles.progressBar, { backgroundColor: isDark ? '#003333' : '#E0F2F1' }]}>
+                    <View style={[styles.progressIndicator, { width: `${((step + 1) / 3) * 100}%`, backgroundColor: themeColors.tint }]} />
                 </View>
                 <Text style={styles.stepIndicator}>{step + 1}/3</Text>
             </View>
@@ -233,7 +251,7 @@ export default function SignupScreen() {
                 {step === 2 && renderStep2Agent()}
             </ScrollView>
 
-            <View style={styles.footer}>
+            <View style={[styles.footer, { backgroundColor: isDark ? '#001A1A' : '#fff', borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
                 <Button
                     title={step === 2 ? "Finish" : "Continue"}
                     onPress={handleNext}
@@ -247,7 +265,6 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
     },
     header: {
         paddingTop: 60,
@@ -259,13 +276,11 @@ const styles = StyleSheet.create({
     progressBar: {
         flex: 1,
         height: 4,
-        backgroundColor: '#E0F2F1',
         borderRadius: 0,
         overflow: 'hidden',
     },
     progressIndicator: {
         height: '100%',
-        backgroundColor: Colors.light.tint,
     },
     stepIndicator: {
         fontSize: 14,
@@ -279,17 +294,14 @@ const styles = StyleSheet.create({
     stepTitle: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#000',
         marginBottom: 10,
     },
     stepSub: {
         fontSize: 16,
-        color: '#546E7A',
         marginBottom: 25,
     },
     label: {
         fontSize: 14,
-        color: '#333',
         marginBottom: 8,
         fontWeight: '500',
         marginTop: 10,
@@ -302,21 +314,12 @@ const styles = StyleSheet.create({
     genderBox: {
         flex: 1,
         borderWidth: 1,
-        borderColor: '#CFD8DC',
         borderRadius: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    genderActive: {
-        borderColor: Colors.light.tint,
-        backgroundColor: Colors.light.secondary,
-    },
     genderText: {
         color: '#546E7A',
-    },
-    genderTextActive: {
-        color: Colors.light.tint,
-        fontWeight: '600',
     },
     templateList: {
         gap: 12,
@@ -324,23 +327,16 @@ const styles = StyleSheet.create({
     templateCard: {
         padding: 16,
         borderWidth: 1,
-        borderColor: '#CFD8DC',
         borderRadius: 2,
         flexDirection: 'row',
         alignItems: 'center',
     },
-    templateCardActive: {
-        borderColor: Colors.light.tint,
-        backgroundColor: Colors.light.secondary,
-    },
     templateName: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#000',
     },
     templateDesc: {
         fontSize: 14,
-        color: '#546E7A',
         marginTop: 4,
     },
     personalityGrid: {
@@ -349,26 +345,15 @@ const styles = StyleSheet.create({
     pBox: {
         padding: 16,
         borderWidth: 1,
-        borderColor: '#CFD8DC',
         borderRadius: 2,
         alignItems: 'center',
-    },
-    pBoxActive: {
-        borderColor: Colors.light.tint,
-        backgroundColor: Colors.light.secondary,
     },
     pText: {
         fontSize: 16,
         color: '#546E7A',
     },
-    pTextActive: {
-        color: Colors.light.tint,
-        fontWeight: '600',
-    },
     footer: {
         padding: 20,
-        backgroundColor: '#fff',
         borderTopWidth: 1,
-        borderTopColor: '#ECEFF1',
     },
 });

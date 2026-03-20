@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import Colors from '../../constants/Colors';
+import { useTheme } from '../../context/ThemeContext';
 
 interface ButtonProps {
     onPress: () => void;
@@ -12,20 +13,26 @@ interface ButtonProps {
 }
 
 export function Button({ onPress, title, outline, style, textStyle, disabled }: ButtonProps) {
+    const { colorScheme } = useTheme();
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
+
     return (
         <TouchableOpacity
             onPress={onPress}
             disabled={disabled}
             style={[
                 styles.button,
-                outline ? styles.outlineButton : styles.primaryButton,
-                disabled && styles.disabledButton,
+                outline
+                    ? { backgroundColor: 'transparent', borderColor: themeColors.tint }
+                    : { backgroundColor: themeColors.tint, borderColor: themeColors.tint },
+                disabled && (isDark ? styles.disabledButtonDark : styles.disabledButton),
                 style
             ]}
         >
             <Text style={[
                 styles.text,
-                outline ? styles.outlineText : styles.primaryText,
+                outline ? { color: themeColors.tint } : { color: '#FFFFFF' },
                 textStyle
             ]}>
                 {title}
@@ -39,32 +46,23 @@ const styles = StyleSheet.create({
         height: 48,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 2, // Slightly rounded but feels square
+        borderRadius: 2,
         borderWidth: 1,
         marginVertical: 10,
         width: '100%',
-    },
-    primaryButton: {
-        backgroundColor: Colors.light.tint,
-        borderColor: Colors.light.tint,
-    },
-    outlineButton: {
-        backgroundColor: 'transparent',
-        borderColor: Colors.light.tint,
     },
     disabledButton: {
         backgroundColor: '#E0E0E0',
         borderColor: '#E0E0E0',
         opacity: 0.6,
     },
+    disabledButtonDark: {
+        backgroundColor: '#333',
+        borderColor: '#333',
+        opacity: 0.6,
+    },
     text: {
         fontWeight: '600',
         fontSize: 16,
-    },
-    primaryText: {
-        color: '#FFFFFF',
-    },
-    outlineText: {
-        color: Colors.light.tint,
     },
 });

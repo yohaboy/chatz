@@ -2,79 +2,83 @@ import { Bell, ChevronRight, FileText, HelpCircle, Moon, Shield } from 'lucide-r
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Colors from '../../../constants/Colors';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function SettingsScreen() {
-    const [darkTheme, setDarkTheme] = useState(false);
+    const { themeMode, setThemeMode, colorScheme } = useTheme();
     const [notifications, setNotifications] = useState(true);
 
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
+
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Preferences</Text>
-                <View style={styles.row}>
-                    <View style={styles.iconContainer}>
-                        <Bell size={20} color="#546E7A" />
+        <ScrollView style={[styles.container, { backgroundColor: themeColors.background }]}>
+            <View style={[styles.section, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: themeColors.border }]}>
+                <Text style={[styles.sectionTitle, { color: themeColors.tint }]}>Preferences</Text>
+                <View style={[styles.row, { borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: themeColors.secondary }]}>
+                        <Bell size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     </View>
-                    <Text style={styles.rowText}>Push Notifications</Text>
+                    <Text style={[styles.rowText, { color: themeColors.text }]}>Push Notifications</Text>
                     <Switch
                         value={notifications}
                         onValueChange={setNotifications}
-                        trackColor={{ false: '#CFD8DC', true: Colors.light.tint }}
+                        trackColor={{ false: isDark ? '#333' : '#CFD8DC', true: themeColors.tint }}
                         thumbColor={notifications ? '#FFF' : '#ECEFF1'}
                     />
                 </View>
-                <View style={styles.row}>
-                    <View style={styles.iconContainer}>
-                        <Moon size={20} color="#546E7A" />
+                <View style={[styles.row, { borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: themeColors.secondary }]}>
+                        <Moon size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     </View>
-                    <Text style={styles.rowText}>Dark Mode</Text>
+                    <Text style={[styles.rowText, { color: themeColors.text }]}>Dark Mode</Text>
                     <Switch
-                        value={darkTheme}
-                        onValueChange={setDarkTheme}
-                        trackColor={{ false: '#CFD8DC', true: Colors.light.tint }}
-                        thumbColor={darkTheme ? '#FFF' : '#ECEFF1'}
+                        value={isDark}
+                        onValueChange={(val) => setThemeMode(val ? 'dark' : 'light')}
+                        trackColor={{ false: isDark ? '#333' : '#CFD8DC', true: themeColors.tint }}
+                        thumbColor={isDark ? '#FFF' : '#ECEFF1'}
                     />
                 </View>
             </View>
 
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Security & Updates</Text>
-                <TouchableOpacity style={styles.row}>
-                    <View style={styles.iconContainer}>
-                        <Shield size={20} color="#546E7A" />
+            <View style={[styles.section, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#004D40' : '#ECEFF1' }]}>
+                <Text style={[styles.sectionTitle, { color: themeColors.tint }]}>Security & Updates</Text>
+                <TouchableOpacity style={[styles.row, { borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: themeColors.secondary }]}>
+                        <Shield size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     </View>
-                    <Text style={styles.rowText}>Two-Factor Auth</Text>
-                    <ChevronRight size={20} color="#CFD8DC" />
+                    <Text style={[styles.rowText, { color: themeColors.text }]}>Two-Factor Auth</Text>
+                    <ChevronRight size={20} color={isDark ? themeColors.border : "#CFD8DC"} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.row}>
-                    <View style={styles.iconContainer}>
-                        <HelpCircle size={20} color="#546E7A" />
+                <TouchableOpacity style={[styles.row, { borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: themeColors.secondary }]}>
+                        <HelpCircle size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     </View>
-                    <Text style={styles.rowText}>Support Center</Text>
-                    <ChevronRight size={20} color="#CFD8DC" />
+                    <Text style={[styles.rowText, { color: themeColors.text }]}>Support Center</Text>
+                    <ChevronRight size={20} color={isDark ? themeColors.border : "#CFD8DC"} />
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Legal</Text>
-                <TouchableOpacity style={styles.row}>
-                    <View style={styles.iconContainer}>
-                        <FileText size={20} color="#546E7A" />
+            <View style={[styles.section, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#004D40' : '#ECEFF1' }]}>
+                <Text style={[styles.sectionTitle, { color: themeColors.tint }]}>Legal</Text>
+                <TouchableOpacity style={[styles.row, { borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: themeColors.secondary }]}>
+                        <FileText size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     </View>
-                    <Text style={styles.rowText}>Privacy Policy</Text>
-                    <ChevronRight size={20} color="#CFD8DC" />
+                    <Text style={[styles.rowText, { color: themeColors.text }]}>Privacy Policy</Text>
+                    <ChevronRight size={20} color={isDark ? themeColors.border : "#CFD8DC"} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.row}>
-                    <View style={styles.iconContainer}>
-                        <FileText size={20} color="#546E7A" />
+                <TouchableOpacity style={[styles.row, { borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: themeColors.secondary }]}>
+                        <FileText size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     </View>
-                    <Text style={styles.rowText}>Terms of Service</Text>
-                    <ChevronRight size={20} color="#CFD8DC" />
+                    <Text style={[styles.rowText, { color: themeColors.text }]}>Terms of Service</Text>
+                    <ChevronRight size={20} color={isDark ? themeColors.border : "#CFD8DC"} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>
-                <Text style={styles.version}>Version 1.0.0 (Building ChatZ...)</Text>
+                <Text style={[styles.version, { color: isDark ? themeColors.tabIconDefault : '#90A4AE' }]}>Version 1.0.0 (Building ChatZ...)</Text>
             </View>
         </ScrollView>
     );
@@ -83,21 +87,17 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
     },
     section: {
         marginTop: 20,
-        backgroundColor: '#FFF',
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: '#ECEFF1',
         paddingHorizontal: 20,
     },
     sectionTitle: {
         paddingVertical: 12,
         fontSize: 14,
         fontWeight: '700',
-        color: Colors.light.tint,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
@@ -106,13 +106,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         borderTopWidth: 1,
-        borderTopColor: '#ECEFF1',
         gap: 12,
     },
     iconContainer: {
         width: 32,
         height: 32,
-        backgroundColor: Colors.light.secondary,
         borderRadius: 2,
         justifyContent: 'center',
         alignItems: 'center',
@@ -120,7 +118,6 @@ const styles = StyleSheet.create({
     rowText: {
         flex: 1,
         fontSize: 16,
-        color: '#333',
         fontWeight: '500',
     },
     footer: {
@@ -129,6 +126,5 @@ const styles = StyleSheet.create({
     },
     version: {
         fontSize: 12,
-        color: '#90A4AE',
     },
 });
