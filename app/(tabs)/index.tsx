@@ -1,6 +1,8 @@
-import { Bot, Clock, ShieldCheck, Zap } from 'lucide-react-native';
+import { storage } from '@/utils/storage';
+import axios from 'axios';
+import { Compass, Lightbulb, MessageSquare, Sparkles } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { getMyAgents } from '../../api/agents';
 import Colors from '../../constants/Colors';
 import { useAuth } from '../../context/AuthContext';
@@ -8,9 +10,12 @@ import { useAuth } from '../../context/AuthContext';
 export default function HomeScreen() {
   const { user } = useAuth();
   const [agents, setAgents] = useState<any[]>([]);
+  const [dailyData, setDailyData] = useState<any>(null);
+  const [loadingDaily, setLoadingDaily] = useState(true);
 
   useEffect(() => {
     loadAgents();
+    loadDailyPulse();
   }, []);
 
   async function loadAgents() {
@@ -18,10 +23,47 @@ export default function HomeScreen() {
       const response = await getMyAgents();
       setAgents(response.data);
     } catch (error) {
-      // Dummy data for demo
-      setAgents([
-        { id: '1', name: 'Zia', age: 24, personality: 'romantic', presence: 'online' }
+      setAgents([{ id: '1', name: 'Zia', age: 24, personality: 'romantic', presence: 'online' }]);
+    }
+  }
+
+  async function loadDailyPulse() {
+    const today = new Date().toISOString().split('T')[0];
+    try {
+      const cached = await storage.getItem('daily_pulse');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.date === today) {
+          setDailyData(parsed);
+          setLoadingDaily(false);
+          return;
+        }
+      }
+
+      // Fetch new data for the day
+      const [jokeRes, factRes, adviceRes] = await Promise.all([
+        axios.get('https://v2.jokeapi.dev/joke/Any?blacklistFlags=racist'),
+        axios.get('https://uselessfacts.jsph.pl/api/v2/facts/random'),
+        axios.get('https://api.adviceslip.com/advice')
       ]);
+
+      const joke = jokeRes.data.type === 'single'
+        ? jokeRes.data.joke
+        : `${jokeRes.data.setup}\n\n${jokeRes.data.delivery}`;
+
+      const data = {
+        date: today,
+        joke,
+        fact: factRes.data.text,
+        advice: adviceRes.data.slip.advice
+      };
+
+      await storage.setItem('daily_pulse', JSON.stringify(data));
+      setDailyData(data);
+    } catch (error) {
+      console.error('Failed to load daily pulse', error);
+    } finally {
+      setLoadingDaily(false);
     }
   }
 
@@ -29,55 +71,55 @@ export default function HomeScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.heroSection}>
         <Text style={styles.greeting}>Hello, {user?.email?.split('@')[0] || 'User'}</Text>
-        <Text style={styles.subGreeting}>Your AI companion is ready to chat.</Text>
+        <Text style={styles.subGreeting}>Your AI world is evolving beautifully.</Text>
       </View>
 
+      {/* Daily Pulse Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>My Agents</Text>
+        <Sparkles color={Colors.light.tint} size={20} />
+        <Text style={styles.sectionTitle}>The Daily Pulse</Text>
       </View>
 
-      {agents.length > 0 ? (
-        <View style={styles.agentsGrid}>
-          {agents.map((agent: any) => (
-            <View key={agent.id} style={styles.agentCard}>
-              <View style={styles.agentIcon}>
-                <Bot color={Colors.light.tint} size={32} />
-                <View style={[styles.statusDot, { backgroundColor: agent.presence === 'online' ? '#4CAF50' : '#bdbdbd' }]} />
-              </View>
-              <Text style={styles.agentName}>{agent.name}</Text>
-              <Text style={styles.agentInfo}>{agent.age} years • {agent.personality}</Text>
-              <TouchableOpacity style={styles.chatBtn}>
-                <Text style={styles.chatBtnText}>Chat Now</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+      {loadingDaily ? (
+        <View style={styles.loadingPulse}>
+          <ActivityIndicator color={Colors.light.tint} />
         </View>
       ) : (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>No agents found. Go to profile to create one.</Text>
+        <View style={styles.pulseContainer}>
+          {/* Card 1: Joke */}
+          <View style={[styles.pulseCard, { borderColor: '#FFF176', backgroundColor: '#FFFDE7' }]}>
+            <View style={styles.cardHeader}>
+              <View style={[styles.iconBox, { backgroundColor: '#FBC02D' }]}>
+                <MessageSquare color="#FFF" size={18} />
+              </View>
+              <Text style={styles.cardTitle}>Daily Laugh</Text>
+            </View>
+            <Text style={styles.cardText}>{dailyData?.joke}</Text>
+          </View>
+
+          {/* Card 2: Fact */}
+          <View style={[styles.pulseCard, { borderColor: '#81D4FA', backgroundColor: '#E1F5FE' }]}>
+            <View style={styles.cardHeader}>
+              <View style={[styles.iconBox, { backgroundColor: '#0288D1' }]}>
+                <Lightbulb color="#FFF" size={18} />
+              </View>
+              <Text style={styles.cardTitle}>Daily Fact</Text>
+            </View>
+            <Text style={styles.cardText}>{dailyData?.fact}</Text>
+          </View>
+
+          {/* Card 3: Advice */}
+          <View style={[styles.pulseCard, { borderColor: '#A5D6A7', backgroundColor: '#E8F5E9' }]}>
+            <View style={styles.cardHeader}>
+              <View style={[styles.iconBox, { backgroundColor: '#388E3C' }]}>
+                <Compass color="#FFF" size={18} />
+              </View>
+              <Text style={styles.cardTitle}>Daily Advice</Text>
+            </View>
+            <Text style={styles.cardText}>{dailyData?.advice}</Text>
+          </View>
         </View>
       )}
-
-      <View style={styles.statsSection}>
-        <Text style={styles.sectionTitle}>Highlights</Text>
-        <View style={styles.statsGrid}>
-          <View style={styles.statItem}>
-            <Zap color={Colors.light.tint} size={20} />
-            <Text style={styles.statVal}>128</Text>
-            <Text style={styles.statLabel}>Messages</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Clock color={Colors.light.tint} size={20} />
-            <Text style={styles.statVal}>4.2h</Text>
-            <Text style={styles.statLabel}>Chat Time</Text>
-          </View>
-          <View style={styles.statItem}>
-            <ShieldCheck color={Colors.light.tint} size={20} />
-            <Text style={styles.statVal}>Pro</Text>
-            <Text style={styles.statLabel}>Secure</Text>
-          </View>
-        </View>
-      </View>
     </ScrollView>
   );
 }
@@ -108,14 +150,59 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 10,
     marginBottom: 16,
+    marginTop: 10,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '800',
     color: '#333',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  loadingPulse: {
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pulseContainer: {
+    gap: 12,
+    marginBottom: 30,
+  },
+  pulseCard: {
+    padding: 20,
+    borderRadius: 2, // Keeping the user's preferred square style
+    borderWidth: 1,
+    borderLeftWidth: 6, // Thick left accent for "modern-meets-fixed" look
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  iconBox: {
+    padding: 6,
+    borderRadius: 4,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#333',
+    textTransform: 'uppercase',
+  },
+  cardText: {
+    fontSize: 15,
+    color: '#263238',
+    lineHeight: 22,
+    fontWeight: '500',
   },
   agentsGrid: {
     marginBottom: 30,
@@ -123,10 +210,15 @@ const styles = StyleSheet.create({
   agentCard: {
     backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: '#ECEFF1',
     borderRadius: 2,
     padding: 20,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   agentIcon: {
     width: 64,
@@ -186,6 +278,7 @@ const styles = StyleSheet.create({
   },
   statsSection: {
     gap: 16,
+    marginBottom: 100,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -195,7 +288,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: '#ECEFF1',
     padding: 16,
     borderRadius: 2,
     alignItems: 'center',

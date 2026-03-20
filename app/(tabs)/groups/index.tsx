@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ChevronRight, PlusCircle, Shield, Users } from 'lucide-react-native';
+import { ChevronRight, Shield, Users } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getChats } from '../../../api/chats';
@@ -37,11 +37,6 @@ export default function GroupsScreen() {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.createBtn}>
-                <PlusCircle color={Colors.light.tint} size={24} />
-                <Text style={styles.createBtnText}>Create New Group</Text>
-            </TouchableOpacity>
-
             <ScrollView contentContainerStyle={styles.content}>
                 {groups.map((group: any) => (
                     <TouchableOpacity

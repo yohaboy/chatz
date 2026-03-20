@@ -31,7 +31,7 @@ export default function ChatsScreen() {
     const handleChatPress = (chat: any) => {
         router.push({
             pathname: '/(tabs)/chats/[id]',
-            params: { id: chat.id, title: chat.name }
+            params: { id: chat.id, title: chat.title || chat.name }
         });
     };
 
@@ -49,7 +49,7 @@ export default function ChatsScreen() {
                         </View>
                         <View style={styles.chatInfo}>
                             <View style={styles.chatHeader}>
-                                <Text style={styles.chatName}>{chat.name}</Text>
+                                <Text style={styles.chatName}>{chat.title || chat.name || 'Agent'}</Text>
                                 <Text style={styles.chatTime}>{chat.time}</Text>
                             </View>
                             <View style={styles.chatFooter}>
