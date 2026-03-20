@@ -1,6 +1,6 @@
-import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import client from '../api/client';
+import { storage } from '../utils/storage';
 
 interface User {
     id: string;
@@ -20,7 +20,7 @@ interface Agent {
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
-    signIn: (token: string, userData: User) => Promise<void>;
+    signIn: (token: string, userData?: User) => Promise<void>;
     signOut: () => Promise<void>;
     updateUser: (userData: User) => void;
 }
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function loadUser() {
         try {
-            const token = await SecureStore.getItemAsync('userToken');
+            const token = await storage.getItem('userToken');
             if (token) {
                 // Fetch current user from /api/v1/auth/me
                 const response = await client.get('/api/v1/auth/me');
@@ -50,13 +50,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    async function signIn(token: string, userData: User) {
-        await SecureStore.setItemAsync('userToken', token);
-        setUser(userData);
+    async function signIn(token: string, userData?: User) {
+        await storage.setItem('userToken', token);
+        if (userData) {
+            setUser(userData);
+        } else {
+            try {
+                // Fetch the current user info separately since it's missing from the auth response
+                const response = await client.get('/api/v1/auth/me');
+                setUser(response.data);
+            } catch (e) {
+                console.error('Failed to load user info after sign-in', e);
+            }
+        }
     }
 
     async function signOut() {
-        await SecureStore.deleteItemAsync('userToken');
+        await storage.deleteItem('userToken');
         setUser(null);
     }
 

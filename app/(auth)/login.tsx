@@ -30,9 +30,13 @@ export default function LoginScreen() {
         try {
             setLoading(true);
             const response = await login({ email, password });
-            const { token, user } = response.data;
-            await signIn(token, user);
-            router.replace('/(tabs)');
+            const { access_token } = response.data;
+            if (access_token) {
+                await signIn(access_token, response.data.user); // pass user if exists, though it likely doesn't
+                router.replace('/(tabs)');
+            } else {
+                throw new Error('No access token received');
+            }
         } catch (error) {
             Alert.alert('Login Failed', 'Invalid credentials');
         } finally {

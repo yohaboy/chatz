@@ -95,9 +95,13 @@ export default function SignupScreen() {
             };
 
             const response = await register(signupData);
-            const { token, user } = response.data;
-            await signIn(token, user);
-            router.replace('/(tabs)');
+            const { access_token } = response.data;
+            if (access_token) {
+                await signIn(access_token);
+                router.replace('/(tabs)');
+            } else {
+                throw new Error('No access token received');
+            }
         } catch (error) {
             Alert.alert('Signup Failed', 'Something went wrong. Please try again.');
             // router.replace('/(tabs)'); // Fallback for demo

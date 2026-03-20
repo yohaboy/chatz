@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ChevronRight, User } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -6,6 +7,7 @@ import Colors from '../../../constants/Colors';
 
 export default function ChatsScreen() {
     const [chats, setChats] = useState<any[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
         loadChats();
@@ -24,11 +26,22 @@ export default function ChatsScreen() {
         }
     }
 
+    const handleChatPress = (chat: any) => {
+        router.push({
+            pathname: '/(tabs)/chats/[id]',
+            params: { id: chat.id, title: chat.name }
+        });
+    };
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.content}>
                 {chats.map((chat: any) => (
-                    <TouchableOpacity key={chat.id} style={styles.chatCard}>
+                    <TouchableOpacity
+                        key={chat.id}
+                        style={styles.chatCard}
+                        onPress={() => handleChatPress(chat)}
+                    >
                         <View style={styles.avatar}>
                             <User color={Colors.light.tint} size={28} />
                         </View>
