@@ -1,18 +1,39 @@
+import { useRouter } from 'expo-router';
 import { ChevronRight, PlusCircle, Shield, Users } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getChats } from '../../../api/chats';
 import Colors from '../../../constants/Colors';
 
 export default function GroupsScreen() {
     const [groups, setGroups] = useState<any[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
-        // Dummy data for demo
-        setGroups([
-            { id: '1', name: 'Agent Support', members: 12, lastMessage: 'System update finished.', time: '11:00 AM' },
-            { id: '2', name: 'Developer Community', members: 45, lastMessage: 'Check the new API docs.', time: '9:30 AM' },
-        ]);
+        loadGroups();
     }, []);
+
+    async function loadGroups() {
+        try {
+            const response = await getChats();
+            // Filter only group chats for this screen
+            const groupChats = response.data.filter((c: any) => c.chat_type?.toLowerCase() === 'group');
+            setGroups(groupChats);
+        } catch (error) {
+            // Dummy data for demo
+            setGroups([
+                { id: '1', title: 'Agent Support', participants: [{}, {}, {}], lastMessage: 'System update finished.', time: '11:00 AM', chat_type: 'group' },
+                { id: '2', title: 'Developer Community', participants: [{}, {}, {}], lastMessage: 'Check the new API docs.', time: '9:30 AM', chat_type: 'group' },
+            ]);
+        }
+    }
+
+    const handleGroupPress = (group: any) => {
+        router.push({
+            pathname: '/(tabs)/chats/[id]',
+            params: { id: group.id, title: group.title || group.name }
+        });
+    };
 
     return (
         <View style={styles.container}>
@@ -23,20 +44,24 @@ export default function GroupsScreen() {
 
             <ScrollView contentContainerStyle={styles.content}>
                 {groups.map((group: any) => (
-                    <TouchableOpacity key={group.id} style={styles.groupCard}>
+                    <TouchableOpacity
+                        key={group.id}
+                        style={styles.groupCard}
+                        onPress={() => handleGroupPress(group)}
+                    >
                         <View style={styles.avatar}>
                             <Users color={Colors.light.tint} size={28} />
                         </View>
                         <View style={styles.groupInfo}>
                             <View style={styles.groupHeader}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                                    <Text style={styles.groupName}>{group.name}</Text>
+                                    <Text style={styles.groupName}>{group.title || group.name}</Text>
                                     {group.id === '1' && <Shield size={14} color={Colors.light.tint} />}
                                 </View>
-                                <Text style={styles.groupTime}>{group.time}</Text>
+                                <Text style={styles.groupTime}>{group.time || 'now'}</Text>
                             </View>
-                            <Text style={styles.memberCount}>{group.members} members</Text>
-                            <Text style={styles.lastMessage} numberOfLines={1}>{group.lastMessage}</Text>
+                            <Text style={styles.memberCount}>{group.participants?.length || group.members || 0} members</Text>
+                            <Text style={styles.lastMessage} numberOfLines={1}>{group.lastMessage || 'No messages yet'}</Text>
                         </View>
                         <ChevronRight color="#CFD8DC" size={20} />
                     </TouchableOpacity>

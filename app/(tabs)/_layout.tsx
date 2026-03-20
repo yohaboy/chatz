@@ -74,6 +74,22 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <SettingsIcon color={color} size={24} />,
         }}
       />
+
+      {/* Hidden Screens */}
+      <Tabs.Screen
+        name="chats/[id]"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="chats/[id]/info"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

@@ -16,12 +16,14 @@ export default function ChatsScreen() {
     async function loadChats() {
         try {
             const response = await getChats();
-            setChats(response.data);
+            // Filter only personal chats for this screen
+            const personalChats = (response.data || []).filter((c: any) => c.chat_type?.toLowerCase() === 'personal');
+            setChats(personalChats);
         } catch (error) {
             // Dummy data for demo
             setChats([
-                { id: '1', name: 'Zia Chat', lastMessage: 'How are you today?', time: '10:45 AM', unread: 2 },
-                { id: '2', name: 'Alex Bot', lastMessage: 'I understand.', time: 'Yesterday', unread: 0 },
+                { id: '1', name: 'Zia Chat', lastMessage: 'How are you today?', time: '10:45 AM', unread: 2, chat_type: 'personal' },
+                { id: '2', name: 'Alex Bot', lastMessage: 'I understand.', time: 'Yesterday', unread: 0, chat_type: 'personal' },
             ]);
         }
     }
