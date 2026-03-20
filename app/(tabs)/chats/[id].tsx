@@ -122,10 +122,27 @@ export default function ChatDetailScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <ArrowLeft color="#000" size={24} />
                 </TouchableOpacity>
-                <View style={styles.headerInfo}>
-                    <Text style={styles.headerTitle}>{title || 'Chat'}</Text>
-                    <Text style={styles.headerStatus}>Online</Text>
-                </View>
+
+                <TouchableOpacity
+                    style={styles.headerInfoContainer}
+                    onPress={() => router.push({
+                        pathname: '/(tabs)/chats/[id]/info',
+                        params: { id, title: title || chat?.title }
+                    })}
+                >
+                    <View style={styles.headerAvatar}>
+                        <Bot size={20} color={Colors.light.tint} />
+                    </View>
+                    <View style={styles.headerInfo}>
+                        <Text style={styles.headerTitle} numberOfLines={1}>{title || chat?.title || 'Chat'}</Text>
+                        <Text style={styles.headerStatus}>
+                            {chat?.chat_type === 'group'
+                                ? `${chat?.participants?.length || 0} members`
+                                : chat?.is_online ? 'Online' : 'Offline'
+                            }
+                        </Text>
+                    </View>
+                </TouchableOpacity>
             </View>
 
             {/* Message List */}
@@ -205,7 +222,21 @@ const styles = StyleSheet.create({
     },
     headerStatus: {
         fontSize: 12,
-        color: '#4CAF50',
+        color: '#546E7A',
+    },
+    headerInfoContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    headerAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: Colors.light.secondary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
     },
     messageList: {
         padding: 16,
