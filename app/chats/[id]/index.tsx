@@ -91,16 +91,11 @@ export default function ChatDetailScreen() {
     return (
       <View style={[styles.messageRow, isMe ? styles.myRow : styles.theirRow]}>
         {isGroup && !isMe ? (
-          <Avatar size={28}>
-            <Bot size={14} color={colors.tint} />
+          <Avatar size={34} style={styles.agentAvatar}>
+            <Bot size={16} color={colors.tint} />
           </Avatar>
         ) : null}
         <View style={[styles.bubbleWrap, isMe ? styles.myWrap : styles.theirWrap]}>
-          {isGroup && !isMe ? (
-            <Text variant="caption" color={colors.textMuted} style={{ marginBottom: spacing.xs }}>
-              {agentName}
-            </Text>
-          ) : null}
           <View
             style={[
               styles.bubble,
@@ -113,6 +108,11 @@ export default function ChatDetailScreen() {
               },
             ]}
           >
+            {isGroup && !isMe ? (
+              <Text variant="caption" color={colors.tint} style={{ marginBottom: spacing.xs }}>
+                {agentName}
+              </Text>
+            ) : null}
             <Text variant="body" color={isMe ? colors.surface : colors.text}>
               {item.content || item.text}
             </Text>
@@ -131,11 +131,11 @@ export default function ChatDetailScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={insets.top}
     >
-      <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}> 
+      <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.surface, paddingTop: insets.top + spacing.sm }]}> 
         <IconButton onPress={() => router.back()} variant="soft">
           <ArrowLeft color={colors.text} size={20} />
         </IconButton>
@@ -229,12 +229,14 @@ const styles = StyleSheet.create({
   messageRow: {
     flexDirection: 'row',
     marginBottom: 16,
+    gap: 8,
   },
   myRow: {
     justifyContent: 'flex-end',
   },
   theirRow: {
     justifyContent: 'flex-start',
+    alignItems: 'flex-end',
   },
   bubbleWrap: {
     maxWidth: '84%',
@@ -244,7 +246,9 @@ const styles = StyleSheet.create({
   },
   theirWrap: {
     alignItems: 'flex-start',
-    marginLeft: 8,
+  },
+  agentAvatar: {
+    marginRight: 4,
   },
   bubble: {
     paddingHorizontal: 16,
