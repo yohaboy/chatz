@@ -32,7 +32,7 @@ export default function ChatsScreen() {
 
     const handleChatPress = (chat: any) => {
         router.push({
-            pathname: '/(tabs)/chats/[id]',
+            pathname: '/chats/[id]',
             params: { id: chat.id, title: chat.title || chat.name }
         });
     };

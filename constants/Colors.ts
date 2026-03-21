@@ -1,5 +1,5 @@
-const tintColorLight = '#008B8B'; // Professional Cyan
-const tintColorDark = '#00B8D4'; // Punchy Cyan
+const tintColorLight = '#008B8B'; // Professional Greenish/Cyan
+const tintColorDark = '#008B8B'; // Matching Greenish/Cyan
 
 export default {
   light: {

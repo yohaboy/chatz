@@ -2,9 +2,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Bot, Calendar, Info, MessageSquare, User } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { getChatDetails } from '../../../../api/chats';
-import Colors from '../../../../constants/Colors';
-import { useTheme } from '../../../../context/ThemeContext';
+import { getChatDetails } from '../../../api/chats';
+import Colors from '../../../constants/Colors';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function ChatInfoScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     header: {
-        paddingTop: 60,
+        paddingTop: 45,
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',

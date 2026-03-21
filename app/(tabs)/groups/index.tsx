@@ -32,7 +32,7 @@ export default function GroupsScreen() {
 
     const handleGroupPress = (group: any) => {
         router.push({
-            pathname: '/(tabs)/chats/[id]',
+            pathname: '/chats/[id]',
             params: { id: group.id, title: group.title || group.name }
         });
     };

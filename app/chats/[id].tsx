@@ -12,10 +12,10 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { getChatDetails, getMessages, sendMessage } from '../../../api/chats';
-import Colors from '../../../constants/Colors';
-import { useAuth } from '../../../context/AuthContext';
-import { useTheme } from '../../../context/ThemeContext';
+import { getChatDetails, getMessages, sendMessage } from '../../api/chats';
+import Colors from '../../constants/Colors';
+import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function ChatDetailScreen() {
     const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
@@ -125,7 +125,7 @@ export default function ChatDetailScreen() {
                 <TouchableOpacity
                     style={styles.headerInfoContainer}
                     onPress={() => router.push({
-                        pathname: '/(tabs)/chats/[id]/info',
+                        pathname: '/chats/[id]/info',
                         params: { id, title: title || chat?.title }
                     })}
                 >
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     header: {
-        paddingTop: 60,
+        paddingTop: 45,
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
