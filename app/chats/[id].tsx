@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
     },
     theirBubbleContainer: {
         alignItems: 'flex-start',
+        paddingRight: 30,
     },
     senderName: {
         fontSize: 12,
