@@ -1,9 +1,8 @@
+import { useRouter } from 'expo-router';
 import { Bell, ChevronRight, FileText, HelpCircle, Moon, Shield } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { ListItem } from '../../../components/ui/ListItem';
-import { PageHeader } from '../../../components/ui/PageHeader';
 import { Screen } from '../../../components/ui/Screen';
 import { Surface } from '../../../components/ui/Surface';
 import { Text } from '../../../components/ui/Text';
@@ -22,8 +21,6 @@ export default function SettingsScreen() {
       padded={false}
       contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xl }}
     >
-      <PageHeader title="Settings" subtitle="Tune your experience" />
-
       <Surface style={{ marginTop: spacing.xl }}>
         <Text variant="overline" color={colors.textMuted}>Preferences</Text>
         <View style={{ marginTop: spacing.md }}>

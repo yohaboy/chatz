@@ -1,11 +1,10 @@
+import { useRouter } from 'expo-router';
 import { ChevronRight, Edit3, LogOut, Shield, User } from 'lucide-react-native';
 import React from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Avatar } from '../../../components/ui/Avatar';
 import { Button } from '../../../components/ui/Button';
 import { ListItem } from '../../../components/ui/ListItem';
-import { PageHeader } from '../../../components/ui/PageHeader';
 import { Screen } from '../../../components/ui/Screen';
 import { Surface } from '../../../components/ui/Surface';
 import { Text } from '../../../components/ui/Text';
@@ -30,8 +29,6 @@ export default function ProfileScreen() {
       padded={false}
       contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xl }}
     >
-      <PageHeader title="Profile" subtitle="Manage your identity" />
-
       <Surface style={{ marginTop: spacing.xl }}>
         <View style={styles.profileHeader}>
           <Avatar size={84}>

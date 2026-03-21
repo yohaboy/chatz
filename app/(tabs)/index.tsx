@@ -1,13 +1,11 @@
 import { storage } from '@/utils/storage';
 import axios from 'axios';
-import { Compass, Lightbulb, MessageSquare, Users } from 'lucide-react-native';
+import { Compass, Lightbulb, MessageSquare } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { getMyAgents } from '../../api/agents';
-import { Avatar } from '../../components/ui/Avatar';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Screen } from '../../components/ui/Screen';
-import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { Text } from '../../components/ui/Text';
 import { useAuth } from '../../context/AuthContext';
@@ -79,34 +77,10 @@ export default function HomeScreen() {
     <Screen scroll>
       <PageHeader
         title={`Hello, ${displayName}`}
-        subtitle="Your daily pulse is ready."
+        subtitle="Your daily Feed is ready."
       />
 
       <View style={{ marginTop: spacing.xxl }}>
-        <SectionHeader title="Your Agents" subtitle="Tap to start a conversation" />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: spacing.md, paddingVertical: spacing.md }}
-        >
-          {agents.map((agent) => (
-            <Surface key={agent.id} style={[styles.agentCard, { minWidth: 160 }]}>
-              <Avatar size={48}>
-                <Users color={colors.tint} size={20} />
-              </Avatar>
-              <Text variant="bodyStrong" style={{ marginTop: spacing.sm }}>
-                {agent.name}
-              </Text>
-              <Text variant="label" color={colors.textMuted}>
-                {agent.personality || 'Companion'}
-              </Text>
-            </Surface>
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={{ marginTop: spacing.xxl }}>
-        <SectionHeader title="Daily Feed" subtitle="Fresh insights just for you" />
         {loadingDaily ? (
           <View style={[styles.loadingBox, { borderColor: colors.border }]}> 
             <ActivityIndicator color={colors.tint} />
