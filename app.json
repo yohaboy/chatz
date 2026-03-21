@@ -23,7 +23,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "experimental_edgeToEdge": true
+      "experimental_edgeToEdge": true,
+      "softwareKeyboardLayoutMode": "resize"
     },
     "androidStatusBar": {
       "backgroundColor": "#00000000",

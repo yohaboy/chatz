@@ -114,8 +114,8 @@ export default function ChatDetailScreen() {
     return (
         <KeyboardAvoidingView
             style={[styles.container, { backgroundColor: themeColors.background }]}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
             <View style={[styles.header, { backgroundColor: isDark ? themeColors.background : themeColors.tint }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
