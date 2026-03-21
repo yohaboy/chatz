@@ -1,22 +1,24 @@
 import { storage } from '@/utils/storage';
 import axios from 'axios';
-import { Compass, Lightbulb, MessageSquare, Sparkles } from 'lucide-react-native';
+import { Compass, Lightbulb, MessageSquare, Users } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { getMyAgents } from '../../api/agents';
-import Colors from '../../constants/Colors';
+import { Avatar } from '../../components/ui/Avatar';
+import { PageHeader } from '../../components/ui/PageHeader';
+import { Screen } from '../../components/ui/Screen';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Surface } from '../../components/ui/Surface';
+import { Text } from '../../components/ui/Text';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { useAppTheme } from '../../hooks/useAppTheme';
 
 export default function HomeScreen() {
   const { user } = useAuth();
-  const { colorScheme } = useTheme();
+  const { colors, spacing } = useAppTheme();
   const [agents, setAgents] = useState<any[]>([]);
   const [dailyData, setDailyData] = useState<any>(null);
   const [loadingDaily, setLoadingDaily] = useState(true);
-
-  const isDark = colorScheme === 'dark';
-  const themeColors = isDark ? Colors.dark : Colors.light;
 
   useEffect(() => {
     loadAgents();
@@ -45,11 +47,10 @@ export default function HomeScreen() {
         }
       }
 
-      // Fetch new data for the day
       const [jokeRes, factRes, adviceRes] = await Promise.all([
         axios.get('https://v2.jokeapi.dev/joke/Any?blacklistFlags=racist'),
         axios.get('https://uselessfacts.jsph.pl/api/v2/facts/random'),
-        axios.get('https://api.adviceslip.com/advice')
+        axios.get('https://api.adviceslip.com/advice'),
       ]);
 
       const joke = jokeRes.data.type === 'single'
@@ -60,7 +61,7 @@ export default function HomeScreen() {
         date: today,
         joke,
         fact: factRes.data.text,
-        advice: adviceRes.data.slip.advice
+        advice: adviceRes.data.slip.advice,
       };
 
       await storage.setItem('daily_pulse', JSON.stringify(data));
@@ -72,143 +73,135 @@ export default function HomeScreen() {
     }
   }
 
+  const displayName = user?.email?.split('@')[0] || 'Friend';
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor: themeColors.background }]} contentContainerStyle={styles.content}>
-      <View style={[styles.heroSection, { borderBottomColor: themeColors.border }]}>
-        <Text style={[styles.greeting, { color: themeColors.text }]}>Hello, {user?.email?.split('@')[0] || 'User'}</Text>
-        <Text style={[styles.subGreeting, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Welcome back to your own world.</Text>
+    <Screen scroll>
+      <PageHeader
+        title={`Hello, ${displayName}`}
+        subtitle="Your daily pulse is ready."
+      />
+
+      <View style={{ marginTop: spacing.xxl }}>
+        <SectionHeader title="Your Agents" subtitle="Tap to start a conversation" />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: spacing.md, paddingVertical: spacing.md }}
+        >
+          {agents.map((agent) => (
+            <Surface key={agent.id} style={[styles.agentCard, { minWidth: 160 }]}>
+              <Avatar size={48}>
+                <Users color={colors.tint} size={20} />
+              </Avatar>
+              <Text variant="bodyStrong" style={{ marginTop: spacing.sm }}>
+                {agent.name}
+              </Text>
+              <Text variant="label" color={colors.textMuted}>
+                {agent.personality || 'Companion'}
+              </Text>
+            </Surface>
+          ))}
+        </ScrollView>
       </View>
 
-      {/* Daily Pulse Section */}
-      <View style={styles.sectionHeader}>
-        <Sparkles color={themeColors.tint} size={20} />
-        <Text style={[styles.sectionTitle, { color: isDark ? themeColors.tint : '#333' }]}>The Daily Feed</Text>
+      <View style={{ marginTop: spacing.xxl }}>
+        <SectionHeader title="Daily Feed" subtitle="Fresh insights just for you" />
+        {loadingDaily ? (
+          <View style={[styles.loadingBox, { borderColor: colors.border }]}> 
+            <ActivityIndicator color={colors.tint} />
+          </View>
+        ) : (
+          <View style={{ gap: spacing.md, marginTop: spacing.md }}>
+            <DailyCard
+              icon={<MessageSquare color={colors.tint} size={18} />}
+              title="Daily Laugh"
+              content={dailyData?.joke}
+              accent={colors.tint}
+            />
+            <DailyCard
+              icon={<Lightbulb color={colors.warning} size={18} />}
+              title="Daily Fact"
+              content={dailyData?.fact}
+              accent={colors.warning}
+            />
+            <DailyCard
+              icon={<Compass color={colors.success} size={18} />}
+              title="Daily Advice"
+              content={dailyData?.advice}
+              accent={colors.success}
+            />
+          </View>
+        )}
       </View>
+    </Screen>
+  );
+}
 
-      {loadingDaily ? (
-        <View style={styles.loadingPulse}>
-          <ActivityIndicator color={themeColors.tint} />
+function DailyCard({
+  icon,
+  title,
+  content,
+  accent,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  content?: string;
+  accent: string;
+}) {
+  const { colors, radius } = useAppTheme();
+
+  return (
+    <Surface style={[styles.feedCard, { borderColor: colors.border }]}>
+      <View style={styles.feedHeader}>
+        <View style={[styles.feedIcon, { backgroundColor: colors.surfaceAlt, borderRadius: radius.sm }]}>
+          {icon}
         </View>
-      ) : (
-        <View style={styles.pulseContainer}>
-          {/* Card 1: Joke */}
-          <View style={[styles.pulseCard, {
-            borderColor: '#FBC02D',
-            backgroundColor: isDark ? '#1A1A1A' : '#FFFDE7'
-          }]}>
-            <View style={styles.cardHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#FBC02D' }]}>
-                <MessageSquare color="#FFF" size={18} />
-              </View>
-              <Text style={[styles.cardTitle, { color: themeColors.text }]}>Daily Laugh</Text>
-            </View>
-            <Text style={[styles.cardText, { color: isDark ? '#B0BEC5' : '#263238' }]}>{dailyData?.joke}</Text>
-          </View>
-
-          {/* Card 2: Fact */}
-          <View style={[styles.pulseCard, {
-            borderColor: '#0288D1',
-            backgroundColor: isDark ? '#1A1A1A' : '#E1F5FE'
-          }]}>
-            <View style={styles.cardHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#0288D1' }]}>
-                <Lightbulb color="#FFF" size={18} />
-              </View>
-              <Text style={[styles.cardTitle, { color: themeColors.text }]}>Daily Fact</Text>
-            </View>
-            <Text style={[styles.cardText, { color: isDark ? '#B0BEC5' : '#263238' }]}>{dailyData?.fact}</Text>
-          </View>
-
-          {/* Card 3: Advice */}
-          <View style={[styles.pulseCard, {
-            borderColor: '#388E3C',
-            backgroundColor: isDark ? '#1A1A1A' : '#E8F5E9'
-          }]}>
-            <View style={styles.cardHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#388E3C' }]}>
-                <Compass color="#FFF" size={18} />
-              </View>
-              <Text style={[styles.cardTitle, { color: themeColors.text }]}>Daily Advice</Text>
-            </View>
-            <Text style={[styles.cardText, { color: isDark ? '#B0BEC5' : '#263238' }]}>{dailyData?.advice}</Text>
-          </View>
-        </View>
-      )}
-    </ScrollView>
+        <Text variant="label" color={colors.textMuted}>{title}</Text>
+        <View style={[styles.feedAccent, { backgroundColor: accent }]} />
+      </View>
+      <Text variant="body" color={colors.text}>
+        {content || 'Loading your update...'}
+      </Text>
+    </Surface>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  agentCard: {
+    gap: 8,
   },
-  content: {
-    padding: 20,
-  },
-  heroSection: {
-    paddingVertical: 30,
-    borderBottomWidth: 1,
-    marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  subGreeting: {
-    fontSize: 16,
-    marginTop: 6,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-    marginTop: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  loadingPulse: {
-    height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pulseContainer: {
-    gap: 12,
-    marginBottom: 30,
-  },
-  pulseCard: {
-    padding: 20,
-    borderRadius: 2,
+  loadingBox: {
+    marginTop: 16,
+    height: 120,
     borderWidth: 1,
-    borderLeftWidth: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  cardHeader: {
+  feedCard: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  feedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     marginBottom: 12,
   },
-  iconBox: {
-    padding: 6,
-    borderRadius: 4,
+  feedIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    textTransform: 'uppercase',
-  },
-  cardText: {
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: '500',
+  feedAccent: {
+    position: 'absolute',
+    right: -20,
+    top: -20,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    opacity: 0.12,
   },
 });

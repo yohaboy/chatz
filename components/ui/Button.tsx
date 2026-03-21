@@ -1,68 +1,125 @@
 import React from 'react';
-import { StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
-import Colors from '../../constants/Colors';
-import { useTheme } from '../../context/ThemeContext';
+import { ActivityIndicator, Pressable, StyleSheet, TextStyle, ViewStyle } from 'react-native';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { Text } from './Text';
+
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
-    onPress: () => void;
-    title: string;
-    outline?: boolean;
-    style?: ViewStyle;
-    textStyle?: TextStyle;
-    disabled?: boolean;
+  title: string;
+  onPress: () => void;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  outline?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
 }
 
-export function Button({ onPress, title, outline, style, textStyle, disabled }: ButtonProps) {
-    const { colorScheme } = useTheme();
-    const isDark = colorScheme === 'dark';
-    const themeColors = isDark ? Colors.dark : Colors.light;
+export function Button({
+  title,
+  onPress,
+  variant = 'primary',
+  size = 'md',
+  outline,
+  disabled,
+  loading,
+  style,
+  textStyle,
+}: ButtonProps) {
+  const { colors, radius, spacing, typography } = useAppTheme();
 
-    return (
-        <TouchableOpacity
-            onPress={onPress}
-            disabled={disabled}
-            style={[
-                styles.button,
-                outline
-                    ? { backgroundColor: 'transparent', borderColor: themeColors.tint }
-                    : { backgroundColor: themeColors.tint, borderColor: themeColors.tint },
-                disabled && (isDark ? styles.disabledButtonDark : styles.disabledButton),
-                style
-            ]}
+  const resolvedVariant: ButtonVariant = outline ? 'outline' : variant;
+  const sizeStyle = sizeStyles[size];
+  const { backgroundColor, borderColor, textColor } = getVariantStyles(resolvedVariant, colors);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || loading}
+      style={({ pressed }) => [
+        styles.base,
+        sizeStyle,
+        {
+          backgroundColor,
+          borderColor,
+          borderRadius: radius.md,
+          opacity: disabled ? 0.55 : pressed ? 0.9 : 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+        },
+        style,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={textColor} />
+      ) : (
+        <Text
+          variant="label"
+          style={[
+            {
+              color: textColor,
+              fontFamily: typography.fonts.semibold,
+              letterSpacing: 0.2,
+            },
+            textStyle,
+          ]}
         >
-            <Text style={[
-                styles.text,
-                outline ? { color: themeColors.tint } : { color: '#FFFFFF' },
-                textStyle
-            ]}>
-                {title}
-            </Text>
-        </TouchableOpacity>
-    );
+          {title}
+        </Text>
+      )}
+    </Pressable>
+  );
+}
+
+const sizeStyles: Record<ButtonSize, ViewStyle> = {
+  sm: { minHeight: 40, paddingHorizontal: 16 },
+  md: { minHeight: 48, paddingHorizontal: 20 },
+  lg: { minHeight: 56, paddingHorizontal: 24 },
+};
+
+function getVariantStyles(variant: ButtonVariant, colors: ReturnType<typeof useAppTheme>['colors']) {
+  switch (variant) {
+    case 'secondary':
+      return {
+        backgroundColor: colors.surfaceAlt,
+        borderColor: colors.border,
+        textColor: colors.text,
+      };
+    case 'outline':
+      return {
+        backgroundColor: 'transparent',
+        borderColor: colors.border,
+        textColor: colors.text,
+      };
+    case 'ghost':
+      return {
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        textColor: colors.tint,
+      };
+    case 'destructive':
+      return {
+        backgroundColor: colors.danger,
+        borderColor: colors.danger,
+        textColor: colors.surface,
+      };
+    case 'primary':
+    default:
+      return {
+        backgroundColor: colors.tint,
+        borderColor: colors.tint,
+        textColor: colors.surface,
+      };
+  }
 }
 
 const styles = StyleSheet.create({
-    button: {
-        height: 48,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 2,
-        borderWidth: 1,
-        marginVertical: 10,
-        width: '100%',
-    },
-    disabledButton: {
-        backgroundColor: '#E0E0E0',
-        borderColor: '#E0E0E0',
-        opacity: 0.6,
-    },
-    disabledButtonDark: {
-        backgroundColor: '#333',
-        borderColor: '#333',
-        opacity: 0.6,
-    },
-    text: {
-        fontWeight: '600',
-        fontSize: 16,
-    },
+  base: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    width: '100%',
+  },
 });

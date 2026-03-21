@@ -1,35 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Button } from '@/components/ui/Button';
+import { Screen } from '@/components/ui/Screen';
+import { Surface } from '@/components/ui/Surface';
+import { Text } from '@/components/ui/Text';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 export default function ModalScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/modal.tsx" />
+  const router = useRouter();
+  const { colors, spacing } = useAppTheme();
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
+  return (
+    <Screen>
+      <View style={styles.header}>
+        <Text variant="headline">Quick Actions</Text>
+        <Text variant="body" color={colors.textMuted}>
+          Start a new chat or spin up a group space.
+        </Text>
+      </View>
+
+      <Surface style={{ marginTop: spacing.xl, gap: spacing.md }}>
+        <Button title="Start New Chat" onPress={() => router.back()} />
+        <Button title="Create Group" variant="secondary" onPress={() => router.back()} />
+      </Surface>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  header: {
+    gap: 8,
   },
 });

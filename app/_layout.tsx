@@ -1,4 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
+import { SpaceGrotesk_400Regular, SpaceGrotesk_500Medium, SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -7,6 +8,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Colors from '../constants/Colors';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
@@ -25,6 +27,8 @@ function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
   const { colorScheme } = useTheme();
+  const scheme = colorScheme === 'dark' ? 'dark' : 'light';
+  const colors = Colors[scheme];
 
   useEffect(() => {
     if (isLoading) return;
@@ -40,14 +44,26 @@ function RootLayoutNav() {
 
   if (isLoading) return null;
 
+  const navTheme = {
+    ...(scheme === 'dark' ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(scheme === 'dark' ? DarkTheme.colors : DefaultTheme.colors),
+      background: colors.background,
+      card: colors.surface,
+      border: colors.border,
+      text: colors.text,
+      primary: colors.tint,
+    },
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: colorScheme === 'dark' ? '#0D0D0D' : '#FAFDFF' }}>
-      <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} translucent />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <NavThemeProvider value={navTheme}>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} translucent />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colorScheme === 'dark' ? '#0D0D0D' : '#FAFDFF' }
+            contentStyle: { backgroundColor: colors.background },
           }}
         >
           <Stack.Screen name="(tabs)" />
@@ -61,6 +77,10 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
+    SpaceGrotesk_700Bold,
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 

@@ -1,62 +1,97 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, TextStyle, View, ViewStyle } from 'react-native';
-import Colors from '../../constants/Colors';
-import { useTheme } from '../../context/ThemeContext';
+import { StyleSheet, TextInput, TextInputProps, View, ViewStyle } from 'react-native';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { Text } from './Text';
 
 interface InputProps extends TextInputProps {
-    label?: string;
-    error?: string;
-    containerStyle?: ViewStyle;
-    inputStyle?: TextStyle;
+  label?: string;
+  hint?: string;
+  error?: string;
+  containerStyle?: ViewStyle;
+  inputStyle?: ViewStyle;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-export function Input(props: InputProps) {
-    const { label, error, containerStyle, inputStyle, ...rest } = props;
-    const { colorScheme } = useTheme();
-    const isDark = colorScheme === 'dark';
-    const themeColors = isDark ? Colors.dark : Colors.light;
+export function Input({
+  label,
+  hint,
+  error,
+  containerStyle,
+  inputStyle,
+  leftIcon,
+  rightIcon,
+  ...rest
+}: InputProps) {
+  const { colors, radius, spacing, typography } = useAppTheme();
+  const [focused, setFocused] = React.useState(false);
 
-    return (
-        <View style={[styles.container, containerStyle]}>
-            {label && <Text style={[styles.label, { color: isDark ? '#B0BEC5' : '#333' }]}>{label}</Text>}
-            <TextInput
-                style={[
-                    styles.input,
-                    {
-                        backgroundColor: isDark ? '#002626' : '#FFFFFF',
-                        color: themeColors.text,
-                        borderColor: error ? '#E53935' : (isDark ? '#004D40' : '#CFD8DC')
-                    },
-                    inputStyle
-                ]}
-                placeholderTextColor={isDark ? '#546E7A' : '#90A4AE'}
-                {...rest}
-            />
-            {error && <Text style={styles.errorText}>{error}</Text>}
-        </View>
-    );
+  const borderColor = error ? colors.danger : focused ? colors.tint : colors.border;
+
+  return (
+    <View style={[styles.container, containerStyle]}>
+      {label ? (
+        <Text variant="label" color={colors.textMuted} style={{ marginBottom: spacing.sm }}>
+          {label}
+        </Text>
+      ) : null}
+      <View
+        style={[
+          styles.inputWrapper,
+          {
+            borderRadius: radius.md,
+            borderColor,
+            backgroundColor: colors.surface,
+            paddingHorizontal: spacing.md,
+          },
+        ]}
+      >
+        {leftIcon ? <View style={styles.icon}>{leftIcon}</View> : null}
+        <TextInput
+          style={[
+            styles.input,
+            {
+              color: colors.text,
+              fontFamily: typography.fonts.regular,
+              fontSize: typography.sizes.md,
+            },
+            inputStyle,
+          ]}
+          placeholderTextColor={colors.textMuted}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          {...rest}
+        />
+        {rightIcon ? <View style={styles.icon}>{rightIcon}</View> : null}
+      </View>
+      {error ? (
+        <Text variant="caption" color={colors.danger} style={{ marginTop: spacing.xs }}>
+          {error}
+        </Text>
+      ) : hint ? (
+        <Text variant="caption" color={colors.textMuted} style={{ marginTop: spacing.xs }}>
+          {hint}
+        </Text>
+      ) : null}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        marginVertical: 10,
-        width: '100%',
-    },
-    label: {
-        fontSize: 14,
-        marginBottom: 6,
-        fontWeight: '500',
-    },
-    input: {
-        height: 48,
-        borderWidth: 1,
-        borderRadius: 2,
-        paddingHorizontal: 12,
-        fontSize: 16,
-    },
-    errorText: {
-        color: '#E53935',
-        fontSize: 12,
-        marginTop: 4,
-    },
+  container: {
+    width: '100%',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    minHeight: 48,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 12,
+  },
+  icon: {
+    marginRight: 8,
+  },
 });
