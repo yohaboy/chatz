@@ -257,22 +257,26 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     messageBubble: {
-        maxWidth: '95%',
+        maxWidth: '100%',
         paddingHorizontal: 16,
         paddingVertical: 10,
         borderRadius: 18,
+        minWidth: 50,
     },
     myBubble: {
         backgroundColor: '#008B8B',
         borderBottomRightRadius: 4,
+        alignSelf: 'flex-end',
     },
     theirBubble: {
         backgroundColor: '#E9F0F2',
         borderBottomLeftRadius: 4,
+        alignSelf: 'flex-start',
     },
     theirBubbleDark: {
         backgroundColor: '#262626',
         borderBottomLeftRadius: 4,
+        alignSelf: 'flex-start',
     },
     messageText: {
         fontSize: 16,
