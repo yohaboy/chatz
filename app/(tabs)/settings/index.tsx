@@ -17,7 +17,11 @@ export default function SettingsScreen() {
   const router = useRouter();
 
   return (
-    <Screen scroll>
+    <Screen
+      scroll
+      padded={false}
+      contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xl }}
+    >
       <PageHeader title="Settings" subtitle="Tune your experience" />
 
       <Surface style={{ marginTop: spacing.xl }}>
@@ -39,7 +43,7 @@ export default function SettingsScreen() {
         </View>
       </Surface>
 
-      <Surface style={{ marginTop: spacing.xl }} padded={false}>
+      <Surface style={{ marginTop: spacing.xl, paddingHorizontal: spacing.sm, paddingVertical: spacing.sm }} padded={false}>
         <View style={styles.sectionHeader}>
           <Text variant="overline" color={colors.textMuted}>Security & Support</Text>
         </View>
@@ -60,7 +64,7 @@ export default function SettingsScreen() {
         />
       </Surface>
 
-      <Surface style={{ marginTop: spacing.xl }} padded={false}>
+      <Surface style={{ marginTop: spacing.xl, paddingHorizontal: spacing.sm, paddingVertical: spacing.sm }} padded={false}>
         <View style={styles.sectionHeader}>
           <Text variant="overline" color={colors.textMuted}>Legal</Text>
         </View>
@@ -123,8 +127,8 @@ function SettingToggle({
 
 const styles = StyleSheet.create({
   sectionHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: 0,
+    paddingTop: 8,
   },
   toggleRow: {
     flexDirection: 'row',

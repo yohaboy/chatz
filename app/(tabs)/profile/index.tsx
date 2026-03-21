@@ -25,7 +25,11 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Screen scroll>
+    <Screen
+      scroll
+      padded={false}
+      contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xl }}
+    >
       <PageHeader title="Profile" subtitle="Manage your identity" />
 
       <Surface style={{ marginTop: spacing.xl }}>
@@ -50,13 +54,13 @@ export default function ProfileScreen() {
         />
       </Surface>
 
-      <Surface style={{ marginTop: spacing.xl }} padded={false}>
+      <Surface style={{ marginTop: spacing.xl, paddingHorizontal: spacing.sm, paddingVertical: spacing.sm }} padded={false}>
         <ListItem title="Age" subtitle={`${user?.age || '25'} years`} showDivider />
         <ListItem title="Gender" subtitle={user?.gender || 'Male'} showDivider />
         <ListItem title="Member since" subtitle="March 2026" showDivider={false} />
       </Surface>
 
-      <Surface style={{ marginTop: spacing.xl }} padded={false}>
+      <Surface style={{ marginTop: spacing.xl, paddingHorizontal: spacing.sm, paddingVertical: spacing.sm }} padded={false}>
         <ListItem
           title="Privacy & Security"
           subtitle="Manage your protections"

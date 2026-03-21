@@ -16,7 +16,7 @@ export function Screen({
   children,
   scroll = false,
   padded = true,
-  background = true,
+  background = false,
   style,
   contentContainerStyle,
 }: ScreenProps) {
@@ -51,36 +51,7 @@ export function Screen({
 }
 
 function ScreenBackground() {
-  const { colors, radius } = useAppTheme();
-
-  return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <View
-        style={[
-          styles.blob,
-          {
-            top: -80,
-            right: -40,
-            backgroundColor: colors.tintSoft,
-            borderRadius: radius.pill,
-            opacity: 0.45,
-          },
-        ]}
-      />
-      <View
-        style={[
-          styles.blob,
-          {
-            bottom: -120,
-            left: -60,
-            backgroundColor: colors.surfaceAlt,
-            borderRadius: radius.pill,
-            opacity: 0.7,
-          },
-        ]}
-      />
-    </View>
-  );
+  return null;
 }
 
 const styles = StyleSheet.create({
