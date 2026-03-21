@@ -34,7 +34,11 @@ export default function LoginScreen() {
         }
         try {
             setLoading(true);
+            console.log('Attempting login to:', process.env.EXPO_PUBLIC_BASE_API_URL);
+
             const response = await login({ email, password });
+            console.log('Login response:', response.data);
+
             const { access_token } = response.data;
             if (access_token) {
                 await signIn(access_token, response.data.user);
@@ -42,8 +46,10 @@ export default function LoginScreen() {
             } else {
                 throw new Error('No access token received');
             }
-        } catch (error) {
-            Alert.alert('Login Failed', 'Invalid credentials');
+        } catch (error: any) {
+            console.error('Login Error:', error);
+            const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
+            Alert.alert('Login Failed', errorMessage);
         } finally {
             setLoading(false);
         }
