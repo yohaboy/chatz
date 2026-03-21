@@ -61,12 +61,12 @@ export default function ChatInfoScreen() {
             </View>
 
             <View style={styles.statsRow}>
-                <View style={[styles.statItem, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#003333' : themeColors.border }]}>
+                <View style={[styles.statItem, { backgroundColor: isDark ? themeColors.secondary : '#FFF', borderColor: isDark ? themeColors.border : themeColors.border }]}>
                     <MessageSquare size={20} color={themeColors.tint} />
                     <Text style={[styles.statValue, { color: themeColors.text }]}>-</Text>
                     <Text style={[styles.statLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Messages</Text>
                 </View>
-                <View style={[styles.statItem, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#003333' : themeColors.border }]}>
+                <View style={[styles.statItem, { backgroundColor: isDark ? themeColors.secondary : '#FFF', borderColor: isDark ? themeColors.border : themeColors.border }]}>
                     <Calendar size={20} color={themeColors.tint} />
                     <Text style={[styles.statValue, { color: themeColors.text }]}>
                         {chat?.last_message_at ? new Date(chat.last_message_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'N/A'}
@@ -75,7 +75,7 @@ export default function ChatInfoScreen() {
                 </View>
             </View>
 
-            <View style={[styles.section, { borderTopColor: isDark ? '#003333' : themeColors.border }]}>
+            <View style={[styles.section, { borderTopColor: isDark ? themeColors.secondary : themeColors.border }]}>
                 <View style={styles.sectionHeader}>
                     <Info size={18} color={themeColors.tint} />
                     <Text style={[styles.sectionTitle, { color: themeColors.text }]}>General Info</Text>
@@ -93,13 +93,13 @@ export default function ChatInfoScreen() {
             </View>
 
             {isGroup && (
-                <View style={[styles.section, { borderTopColor: isDark ? '#003333' : themeColors.border }]}>
+                <View style={[styles.section, { borderTopColor: isDark ? themeColors.secondary : themeColors.border }]}>
                     <View style={styles.sectionHeader}>
                         <User size={18} color={themeColors.tint} />
                         <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Members ({chat?.participants?.length || 0})</Text>
                     </View>
                     {chat?.participants?.map((p: any) => (
-                        <View key={p.id} style={[styles.memberCard, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#003333' : themeColors.border }]}>
+                        <View key={p.id} style={[styles.memberCard, { backgroundColor: isDark ? themeColors.secondary : '#FFF', borderColor: isDark ? themeColors.border : themeColors.border }]}>
                             <View style={[styles.memberAvatar, { backgroundColor: themeColors.secondary }]}>
                                 <Bot size={20} color={themeColors.tint} />
                             </View>
@@ -115,7 +115,7 @@ export default function ChatInfoScreen() {
             )}
 
             {!isGroup && chat?.participants?.[0] && (
-                <View style={[styles.section, { borderTopColor: isDark ? '#003333' : themeColors.border, borderBottomWidth: 0 }]}>
+                <View style={[styles.section, { borderTopColor: isDark ? themeColors.secondary : themeColors.border, borderBottomWidth: 0 }]}>
                     <View style={styles.sectionHeader}>
                         <User size={18} color={themeColors.tint} />
                         <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Agent Profile</Text>

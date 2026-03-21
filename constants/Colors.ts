@@ -1,5 +1,5 @@
 const tintColorLight = '#008B8B'; // Professional Cyan
-const tintColorDark = '#4DD0E1';
+const tintColorDark = '#00B8D4'; // Punchy Cyan
 
 export default {
   light: {
@@ -14,12 +14,12 @@ export default {
   },
   dark: {
     text: '#FFFFFF',
-    background: '#001A1A',
+    background: '#0D0D0D', // Pure deep dark
     tint: tintColorDark,
-    tabIconDefault: '#546E7A',
+    tabIconDefault: '#78909C',
     tabIconSelected: tintColorDark,
-    secondary: '#004D40',
-    border: '#00838F',
+    secondary: '#1A1C1E', // Very dark grey/charcoal
+    border: '#2C2E33',
     accent: '#80DEEA',
   },
 };

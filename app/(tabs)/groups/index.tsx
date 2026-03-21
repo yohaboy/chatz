@@ -43,7 +43,7 @@ export default function GroupsScreen() {
                 {groups.map((group: any) => (
                     <TouchableOpacity
                         key={group.id}
-                        style={[styles.groupCard, { backgroundColor: isDark ? '#002626' : '#FFF', borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]}
+                        style={[styles.groupCard, { backgroundColor: isDark ? themeColors.background : '#FFF', borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]}
                         onPress={() => handleGroupPress(group)}
                     >
                         <View style={[styles.avatar, { backgroundColor: themeColors.secondary }]}>

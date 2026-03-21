@@ -101,13 +101,13 @@ export default function LoginScreen() {
                 <Button title="Sign In" onPress={handleLogin} disabled={loading} />
 
                 <View style={styles.divider}>
-                    <View style={[styles.line, { backgroundColor: isDark ? '#003333' : '#ECEFF1' }]} />
+                    <View style={[styles.line, { backgroundColor: isDark ? themeColors.border : '#ECEFF1' }]} />
                     <Text style={styles.dividerText}>OR</Text>
-                    <View style={[styles.line, { backgroundColor: isDark ? '#003333' : '#ECEFF1' }]} />
+                    <View style={[styles.line, { backgroundColor: isDark ? themeColors.border : '#ECEFF1' }]} />
                 </View>
 
                 <TouchableOpacity
-                    style={[styles.googleButton, { backgroundColor: isDark ? '#002626' : '#fff', borderColor: isDark ? '#004D40' : '#CFD8DC' }]}
+                    style={[styles.googleButton, { backgroundColor: isDark ? themeColors.secondary : '#fff', borderColor: isDark ? themeColors.border : '#CFD8DC' }]}
                     onPress={handleGoogleLogin}
                     disabled={!request}
                 >

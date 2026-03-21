@@ -23,7 +23,16 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "usesCleartextTraffic": true
+      "experimental_edgeToEdge": true
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#00000000",
+      "translucent": true,
+      "barStyle": "light-content"
+    },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive",
+      "backgroundColor": "#00000000"
     },
     "web": {
       "bundler": "metro",

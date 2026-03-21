@@ -145,7 +145,7 @@ export default function SignupScreen() {
                         <TouchableOpacity
                             style={[
                                 styles.genderBox,
-                                { borderColor: isDark ? '#004D40' : '#CFD8DC' },
+                                { borderColor: isDark ? themeColors.border : '#CFD8DC' },
                                 userInfo.gender === 'male' && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
                             ]}
                             onPress={() => setUserInfo({ ...userInfo, gender: 'male' })}
@@ -155,7 +155,7 @@ export default function SignupScreen() {
                         <TouchableOpacity
                             style={[
                                 styles.genderBox,
-                                { borderColor: isDark ? '#004D40' : '#CFD8DC' },
+                                { borderColor: isDark ? themeColors.border : '#CFD8DC' },
                                 userInfo.gender === 'female' && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
                             ]}
                             onPress={() => setUserInfo({ ...userInfo, gender: 'female' })}
@@ -178,7 +178,7 @@ export default function SignupScreen() {
                         key={t.id}
                         style={[
                             styles.templateCard,
-                            { borderColor: isDark ? '#004D40' : '#CFD8DC', backgroundColor: isDark ? '#002626' : 'transparent' },
+                            { borderColor: isDark ? themeColors.border : '#CFD8DC', backgroundColor: isDark ? themeColors.secondary : 'transparent' },
                             selectedTemplate?.id === t.id && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
                         ]}
                         onPress={() => setSelectedTemplate(t)}
@@ -217,7 +217,7 @@ export default function SignupScreen() {
                         key={p}
                         style={[
                             styles.pBox,
-                            { borderColor: isDark ? '#004D40' : '#CFD8DC', backgroundColor: isDark ? '#002626' : 'transparent' },
+                            { borderColor: isDark ? themeColors.border : '#CFD8DC', backgroundColor: isDark ? themeColors.secondary : 'transparent' },
                             agentCustomization.personality === p && { borderColor: themeColors.tint, backgroundColor: themeColors.secondary }
                         ]}
                         onPress={() => setAgentCustomization({ ...agentCustomization, personality: p })}
@@ -239,7 +239,7 @@ export default function SignupScreen() {
                         <ChevronLeft color={themeColors.text} />
                     </TouchableOpacity>
                 )}
-                <View style={[styles.progressBar, { backgroundColor: isDark ? '#003333' : '#E0F2F1' }]}>
+                <View style={[styles.progressBar, { backgroundColor: isDark ? themeColors.secondary : '#E0F2F1' }]}>
                     <View style={[styles.progressIndicator, { width: `${((step + 1) / 3) * 100}%`, backgroundColor: themeColors.tint }]} />
                 </View>
                 <Text style={styles.stepIndicator}>{step + 1}/3</Text>
@@ -251,7 +251,7 @@ export default function SignupScreen() {
                 {step === 2 && renderStep2Agent()}
             </ScrollView>
 
-            <View style={[styles.footer, { backgroundColor: isDark ? '#001A1A' : '#fff', borderTopColor: isDark ? '#003333' : '#ECEFF1' }]}>
+            <View style={[styles.footer, { backgroundColor: isDark ? themeColors.background : '#fff', borderTopColor: isDark ? themeColors.secondary : '#ECEFF1' }]}>
                 <Button
                     title={step === 2 ? "Finish" : "Continue"}
                     onPress={handleNext}

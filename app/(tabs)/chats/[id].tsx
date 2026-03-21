@@ -117,7 +117,7 @@ export default function ChatDetailScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
-            <View style={[styles.header, { backgroundColor: isDark ? '#000B0B' : themeColors.tint }]}>
+            <View style={[styles.header, { backgroundColor: isDark ? themeColors.background : themeColors.tint }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <ArrowLeft color="#FFF" size={24} />
                 </TouchableOpacity>
@@ -129,7 +129,7 @@ export default function ChatDetailScreen() {
                         params: { id, title: title || chat?.title }
                     })}
                 >
-                    <View style={[styles.headerAvatar, { backgroundColor: isDark ? '#002626' : '#FFF' }]}>
+                    <View style={[styles.headerAvatar, { backgroundColor: isDark ? themeColors.secondary : '#FFF' }]}>
                         <Bot size={20} color={themeColors.tint} />
                     </View>
                     <View style={styles.headerInfo}>
@@ -160,13 +160,13 @@ export default function ChatDetailScreen() {
                 />
             )}
 
-            <View style={[styles.inputArea, { backgroundColor: isDark ? '#001A1A' : '#FFF', borderTopColor: isDark ? '#003333' : themeColors.border }]}>
+            <View style={[styles.inputArea, { backgroundColor: isDark ? themeColors.background : '#FFF', borderTopColor: isDark ? themeColors.secondary : themeColors.border }]}>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={[
                             styles.input,
                             {
-                                backgroundColor: isDark ? '#002626' : '#F5F5F5',
+                                backgroundColor: isDark ? themeColors.secondary : '#F5F5F5',
                                 color: themeColors.text,
                                 maxHeight: 100
                             }
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 2,
     },
     theirBubbleDark: {
-        backgroundColor: '#003333',
+        backgroundColor: '#1E1E1E',
         borderBottomLeftRadius: 2,
     },
     messageText: {

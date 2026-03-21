@@ -93,44 +93,44 @@ export default function HomeScreen() {
         <View style={styles.pulseContainer}>
           {/* Card 1: Joke */}
           <View style={[styles.pulseCard, {
-            borderColor: isDark ? '#FBC02D' : '#FFF176',
-            backgroundColor: isDark ? '#1A1A00' : '#FFFDE7'
+            borderColor: '#FBC02D',
+            backgroundColor: isDark ? '#1A1A1A' : '#FFFDE7'
           }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconBox, { backgroundColor: '#FBC02D' }]}>
                 <MessageSquare color="#FFF" size={18} />
               </View>
-              <Text style={[styles.cardTitle, { color: isDark ? themeColors.text : '#333' }]}>Daily Laugh</Text>
+              <Text style={[styles.cardTitle, { color: themeColors.text }]}>Daily Laugh</Text>
             </View>
-            <Text style={[styles.cardText, { color: isDark ? '#ECEFF1' : '#263238' }]}>{dailyData?.joke}</Text>
+            <Text style={[styles.cardText, { color: isDark ? '#B0BEC5' : '#263238' }]}>{dailyData?.joke}</Text>
           </View>
 
           {/* Card 2: Fact */}
           <View style={[styles.pulseCard, {
-            borderColor: isDark ? '#0288D1' : '#81D4FA',
-            backgroundColor: isDark ? '#001320' : '#E1F5FE'
+            borderColor: '#0288D1',
+            backgroundColor: isDark ? '#1A1A1A' : '#E1F5FE'
           }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconBox, { backgroundColor: '#0288D1' }]}>
                 <Lightbulb color="#FFF" size={18} />
               </View>
-              <Text style={[styles.cardTitle, { color: isDark ? themeColors.text : '#333' }]}>Daily Fact</Text>
+              <Text style={[styles.cardTitle, { color: themeColors.text }]}>Daily Fact</Text>
             </View>
-            <Text style={[styles.cardText, { color: isDark ? '#ECEFF1' : '#263238' }]}>{dailyData?.fact}</Text>
+            <Text style={[styles.cardText, { color: isDark ? '#B0BEC5' : '#263238' }]}>{dailyData?.fact}</Text>
           </View>
 
           {/* Card 3: Advice */}
           <View style={[styles.pulseCard, {
-            borderColor: isDark ? '#388E3C' : '#A5D6A7',
-            backgroundColor: isDark ? '#001A00' : '#E8F5E9'
+            borderColor: '#388E3C',
+            backgroundColor: isDark ? '#1A1A1A' : '#E8F5E9'
           }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconBox, { backgroundColor: '#388E3C' }]}>
                 <Compass color="#FFF" size={18} />
               </View>
-              <Text style={[styles.cardTitle, { color: isDark ? themeColors.text : '#333' }]}>Daily Advice</Text>
+              <Text style={[styles.cardTitle, { color: themeColors.text }]}>Daily Advice</Text>
             </View>
-            <Text style={[styles.cardText, { color: isDark ? '#ECEFF1' : '#263238' }]}>{dailyData?.advice}</Text>
+            <Text style={[styles.cardText, { color: isDark ? '#B0BEC5' : '#263238' }]}>{dailyData?.advice}</Text>
           </View>
         </View>
       )}

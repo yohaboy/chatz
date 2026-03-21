@@ -20,7 +20,7 @@ export default function ProfileScreen() {
 
     return (
         <ScrollView style={[styles.container, { backgroundColor: themeColors.background }]}>
-            <View style={[styles.header, { backgroundColor: isDark ? '#002626' : '#FFF', borderBottomColor: themeColors.border }]}>
+            <View style={[styles.header, { backgroundColor: isDark ? themeColors.background : '#FFF', borderBottomColor: themeColors.border }]}>
                 <View style={[styles.avatar, { backgroundColor: themeColors.secondary }]}>
                     <User size={48} color={themeColors.tint} />
                 </View>
@@ -34,15 +34,15 @@ export default function ProfileScreen() {
 
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Account Details</Text>
-                <View style={[styles.infoRow, { borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                <View style={[styles.infoRow, { borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]}>
                     <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Age</Text>
                     <Text style={[styles.infoValue, { color: themeColors.text }]}>{user?.age || '25'}</Text>
                 </View>
-                <View style={[styles.infoRow, { borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                <View style={[styles.infoRow, { borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]}>
                     <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Gender</Text>
                     <Text style={[styles.infoValue, { color: themeColors.text }]}>{user?.gender || 'Male'}</Text>
                 </View>
-                <View style={[styles.infoRow, { borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                <View style={[styles.infoRow, { borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]}>
                     <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Member Since</Text>
                     <Text style={[styles.infoValue, { color: themeColors.text }]}>March 2026</Text>
                 </View>
@@ -50,12 +50,12 @@ export default function ProfileScreen() {
 
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Actions</Text>
-                <TouchableOpacity style={[styles.actionBtn, { borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]}>
+                <TouchableOpacity style={[styles.actionBtn, { borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]}>
                     <Shield size={20} color={isDark ? themeColors.tint : "#546E7A"} />
                     <Text style={[styles.actionBtnText, { color: themeColors.text }]}>Privacy & Security</Text>
                     <ChevronRight size={20} color={isDark ? themeColors.border : "#CFD8DC"} />
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionBtn, { borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]} onPress={handleSignOut}>
+                <TouchableOpacity style={[styles.actionBtn, { borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]} onPress={handleSignOut}>
                     <LogOut size={20} color="#F44336" />
                     <Text style={[styles.actionBtnText, { color: '#F44336' }]}>Sign Out</Text>
                     <ChevronRight size={20} color={isDark ? themeColors.border : "#CFD8DC"} />

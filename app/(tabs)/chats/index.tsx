@@ -43,7 +43,7 @@ export default function ChatsScreen() {
                 {chats.map((chat: any) => (
                     <TouchableOpacity
                         key={chat.id}
-                        style={[styles.chatCard, { backgroundColor: isDark ? '#002626' : '#FFF', borderBottomColor: isDark ? '#003333' : '#ECEFF1' }]}
+                        style={[styles.chatCard, { backgroundColor: isDark ? themeColors.background : '#FFF', borderBottomColor: isDark ? themeColors.border : '#ECEFF1' }]}
                         onPress={() => handleChatPress(chat)}
                     >
                         <View style={[styles.avatar, { backgroundColor: themeColors.secondary }]}>
