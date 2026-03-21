@@ -341,6 +341,7 @@ const styles = StyleSheet.create({
     },
     myBubbleContainer: {
         alignItems: 'flex-end',
+        paddingLeft: 30,
     },
     theirBubbleContainer: {
         alignItems: 'flex-start',
