@@ -257,21 +257,22 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     messageBubble: {
-        maxWidth: '80%',
-        padding: 12,
-        borderRadius: 12,
+        maxWidth: '95%',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 18,
     },
     myBubble: {
         backgroundColor: '#008B8B',
-        borderBottomRightRadius: 2,
+        borderBottomRightRadius: 4,
     },
     theirBubble: {
-        backgroundColor: '#E0F7FA',
-        borderBottomLeftRadius: 2,
+        backgroundColor: '#E9F0F2',
+        borderBottomLeftRadius: 4,
     },
     theirBubbleDark: {
-        backgroundColor: '#1E1E1E',
-        borderBottomLeftRadius: 2,
+        backgroundColor: '#262626',
+        borderBottomLeftRadius: 4,
     },
     messageText: {
         fontSize: 16,
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     messageBubbleContainer: {
-        maxWidth: '80%',
+        maxWidth: '95%',
     },
     myBubbleContainer: {
         alignItems: 'flex-end',
