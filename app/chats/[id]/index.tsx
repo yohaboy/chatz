@@ -12,10 +12,10 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { getChatDetails, getMessages, sendMessage } from '../../api/chats';
-import Colors from '../../constants/Colors';
-import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { getChatDetails, getMessages, sendMessage } from '../../../api/chats';
+import Colors from '../../../constants/Colors';
+import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function ChatDetailScreen() {
     const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
@@ -77,7 +77,7 @@ export default function ChatDetailScreen() {
         }
     };
 
-    const renderMessage = ({ item }: { item: any }) => {
+    const renderMessage = React.useCallback(({ item }: { item: any }) => {
         const isMe = item.sender_user_id === user?.id || item.is_user_message;
         const isGroup = chat?.chat_type?.toLowerCase() === 'group';
 
@@ -109,7 +109,7 @@ export default function ChatDetailScreen() {
                 </View>
             </View>
         );
-    };
+    }, [user, chat, themeColors, isDark]);
 
     return (
         <KeyboardAvoidingView

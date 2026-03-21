@@ -39,7 +39,7 @@ export default function ChatsScreen() {
 
     return (
         <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-            <ScrollView contentContainerStyle={styles.content}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content}>
                 {chats.map((chat: any) => (
                     <TouchableOpacity
                         key={chat.id}
