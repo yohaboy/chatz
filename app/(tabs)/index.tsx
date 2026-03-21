@@ -158,7 +158,6 @@ function DailyCard({
           {icon}
         </View>
         <Text variant="label" color={colors.textMuted}>{title}</Text>
-        <View style={[styles.feedAccent, { backgroundColor: accent }]} />
       </View>
       <Text variant="body" color={colors.text}>
         {content || 'Loading your update...'}
@@ -194,14 +193,5 @@ const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  feedAccent: {
-    position: 'absolute',
-    right: -20,
-    top: -20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    opacity: 0.12,
   },
 });

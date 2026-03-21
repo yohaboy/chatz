@@ -133,6 +133,7 @@ export default function ChatDetailScreen() {
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={insets.top}
     >
       <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}> 
         <IconButton onPress={() => router.back()} variant="soft">

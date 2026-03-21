@@ -28,6 +28,7 @@ export function Screen({
     paddingHorizontal: basePadding,
     paddingTop: basePadding + insets.top,
     paddingBottom: basePadding + insets.bottom,
+    flexGrow: 1,
   };
 
   return (
