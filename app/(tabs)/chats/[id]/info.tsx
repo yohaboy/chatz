@@ -4,10 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getChatDetails } from '../../../../api/chats';
 import Colors from '../../../../constants/Colors';
+import { useTheme } from '../../../../context/ThemeContext';
 
 export default function ChatInfoScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
+    const { colorScheme } = useTheme();
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
+
     const [chat, setChat] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -28,8 +33,8 @@ export default function ChatInfoScreen() {
 
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator color={Colors.light.tint} />
+            <View style={[styles.center, { backgroundColor: themeColors.background }]}>
+                <ActivityIndicator color={themeColors.tint} />
             </View>
         );
     }
@@ -37,70 +42,70 @@ export default function ChatInfoScreen() {
     const isGroup = chat?.chat_type?.toLowerCase() === 'group';
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, { backgroundColor: themeColors.background }]}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <ArrowLeft color="#000" size={24} />
+                    <ArrowLeft color={themeColors.text} size={24} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Details</Text>
+                <Text style={[styles.headerTitle, { color: themeColors.text }]}>Details</Text>
             </View>
 
             <View style={styles.profileSection}>
-                <View style={styles.profileAvatar}>
-                    <Bot size={60} color={Colors.light.tint} />
+                <View style={[styles.profileAvatar, { backgroundColor: themeColors.secondary }]}>
+                    <Bot size={60} color={themeColors.tint} />
                 </View>
-                <Text style={styles.profileName}>{chat?.title || 'Chat'}</Text>
-                <Text style={styles.profileType}>
+                <Text style={[styles.profileName, { color: themeColors.text }]}>{chat?.title || 'Chat'}</Text>
+                <Text style={[styles.profileType, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>
                     {isGroup ? 'Group Chat' : 'Personal Agent'}
                 </Text>
             </View>
 
             <View style={styles.statsRow}>
-                <View style={styles.statItem}>
-                    <MessageSquare size={20} color={Colors.light.tint} />
-                    <Text style={styles.statValue}>-</Text>
-                    <Text style={styles.statLabel}>Messages</Text>
+                <View style={[styles.statItem, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#003333' : themeColors.border }]}>
+                    <MessageSquare size={20} color={themeColors.tint} />
+                    <Text style={[styles.statValue, { color: themeColors.text }]}>-</Text>
+                    <Text style={[styles.statLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Messages</Text>
                 </View>
-                <View style={styles.statItem}>
-                    <Calendar size={20} color={Colors.light.tint} />
-                    <Text style={styles.statValue}>
-                        {new Date(chat?.last_message_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                <View style={[styles.statItem, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#003333' : themeColors.border }]}>
+                    <Calendar size={20} color={themeColors.tint} />
+                    <Text style={[styles.statValue, { color: themeColors.text }]}>
+                        {chat?.last_message_at ? new Date(chat.last_message_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'N/A'}
                     </Text>
-                    <Text style={styles.statLabel}>Activity</Text>
+                    <Text style={[styles.statLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Activity</Text>
                 </View>
             </View>
 
-            <View style={styles.section}>
+            <View style={[styles.section, { borderTopColor: isDark ? '#003333' : themeColors.border }]}>
                 <View style={styles.sectionHeader}>
-                    <Info size={18} color={Colors.light.tint} />
-                    <Text style={styles.sectionTitle}>General Info</Text>
+                    <Info size={18} color={themeColors.tint} />
+                    <Text style={[styles.sectionTitle, { color: themeColors.text }]}>General Info</Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Type:</Text>
-                    <Text style={styles.infoValue}>{isGroup ? 'Public Group' : 'Direct Access'}</Text>
+                    <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Type:</Text>
+                    <Text style={[styles.infoValue, { color: themeColors.text }]}>{isGroup ? 'Public Group' : 'Direct Access'}</Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Created:</Text>
-                    <Text style={styles.infoValue}>
+                    <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Created:</Text>
+                    <Text style={[styles.infoValue, { color: themeColors.text }]}>
                         {new Date(chat?.created_at || Date.now()).toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' })}
                     </Text>
                 </View>
             </View>
 
             {isGroup && (
-                <View style={styles.section}>
+                <View style={[styles.section, { borderTopColor: isDark ? '#003333' : themeColors.border }]}>
                     <View style={styles.sectionHeader}>
-                        <User size={18} color={Colors.light.tint} />
-                        <Text style={styles.sectionTitle}>Members ({chat?.participants?.length || 0})</Text>
+                        <User size={18} color={themeColors.tint} />
+                        <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Members ({chat?.participants?.length || 0})</Text>
                     </View>
                     {chat?.participants?.map((p: any) => (
-                        <View key={p.id} style={styles.memberCard}>
-                            <View style={styles.memberAvatar}>
-                                <Bot size={20} color={Colors.light.tint} />
+                        <View key={p.id} style={[styles.memberCard, { backgroundColor: isDark ? '#002626' : '#FFF', borderColor: isDark ? '#003333' : themeColors.border }]}>
+                            <View style={[styles.memberAvatar, { backgroundColor: themeColors.secondary }]}>
+                                <Bot size={20} color={themeColors.tint} />
                             </View>
                             <View style={styles.memberInfo}>
-                                <Text style={styles.memberName}>{p.agent_name}</Text>
-                                <Text style={styles.memberStatus}>
+                                <Text style={[styles.memberName, { color: themeColors.text }]}>{p.agent_name}</Text>
+                                <Text style={[styles.memberStatus, { color: p.is_online ? '#4CAF50' : '#FF9800' }]}>
                                     {p.is_online ? 'online' : 'away'}
                                 </Text>
                             </View>
@@ -110,18 +115,18 @@ export default function ChatInfoScreen() {
             )}
 
             {!isGroup && chat?.participants?.[0] && (
-                <View style={[styles.section, { borderBottomWidth: 0 }]}>
+                <View style={[styles.section, { borderTopColor: isDark ? '#003333' : themeColors.border, borderBottomWidth: 0 }]}>
                     <View style={styles.sectionHeader}>
-                        <User size={18} color={Colors.light.tint} />
-                        <Text style={styles.sectionTitle}>Agent Profile</Text>
+                        <User size={18} color={themeColors.tint} />
+                        <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Agent Profile</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Gender:</Text>
-                        <Text style={styles.infoValue}>{chat.participants[0].agent_gender}</Text>
+                        <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Gender:</Text>
+                        <Text style={[styles.infoValue, { color: themeColors.text }]}>{chat.participants[0].agent_gender}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Role:</Text>
-                        <Text style={styles.infoValue}>Personalized AI Assistant</Text>
+                        <Text style={[styles.infoLabel, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>Role:</Text>
+                        <Text style={[styles.infoValue, { color: themeColors.text }]}>Personalized AI Assistant</Text>
                     </View>
                 </View>
             )}
@@ -132,7 +137,6 @@ export default function ChatInfoScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
     },
     center: {
         flex: 1,
@@ -161,7 +165,6 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: Colors.light.secondary,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
@@ -169,11 +172,9 @@ const styles = StyleSheet.create({
     profileName: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#000',
     },
     profileType: {
         fontSize: 14,
-        color: '#546E7A',
         marginTop: 4,
     },
     statsRow: {
@@ -184,9 +185,7 @@ const styles = StyleSheet.create({
     },
     statItem: {
         flex: 1,
-        backgroundColor: '#FFF',
         borderWidth: 1,
-        borderColor: Colors.light.border,
         borderRadius: 2,
         padding: 16,
         alignItems: 'center',
@@ -198,14 +197,12 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 12,
-        color: '#546E7A',
         marginTop: 2,
     },
     section: {
         paddingTop: 24,
         marginHorizontal: 20,
         borderTopWidth: 1,
-        borderTopColor: Colors.light.border,
         paddingBottom: 24,
     },
     sectionHeader: {
@@ -217,7 +214,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#000',
     },
     infoRow: {
         flexDirection: 'row',
@@ -225,7 +221,6 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     infoLabel: {
-        color: '#546E7A',
     },
     infoValue: {
         fontWeight: '600',
@@ -233,17 +228,14 @@ const styles = StyleSheet.create({
     memberCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF',
         padding: 12,
         borderWidth: 1,
-        borderColor: Colors.light.border,
         borderRadius: 2,
         marginBottom: 8,
     },
     memberAvatar: {
         width: 40,
         height: 40,
-        backgroundColor: Colors.light.secondary,
         borderRadius: 2,
         justifyContent: 'center',
         alignItems: 'center',
@@ -254,10 +246,8 @@ const styles = StyleSheet.create({
     },
     memberName: {
         fontWeight: '600',
-        color: '#000',
     },
     memberStatus: {
         fontSize: 12,
-        color: '#4CAF50',
     },
 });

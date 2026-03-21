@@ -1,20 +1,22 @@
 import { Tabs } from 'expo-router';
 import { Home, MessageCircle, Settings as SettingsIcon, User, Users } from 'lucide-react-native';
 import React from 'react';
-import { useColorScheme } from '../../components/useColorScheme';
 import Colors from '../../constants/Colors';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colorScheme } = useTheme();
+  const theme = colorScheme ?? 'light';
+  const isDark = theme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-        tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
+        tabBarActiveTintColor: Colors[theme].tint,
+        tabBarInactiveTintColor: Colors[theme].tabIconDefault,
         headerShown: true,
         headerStyle: {
-          backgroundColor: Colors[colorScheme].tint,
+          backgroundColor: isDark ? '#000B0B' : Colors[theme].tint,
           elevation: 4,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
@@ -30,9 +32,9 @@ export default function TabLayout() {
           letterSpacing: 0.5,
         },
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme].background,
+          backgroundColor: isDark ? '#000B0B' : Colors[theme].background,
           borderTopWidth: 1,
-          borderTopColor: Colors[colorScheme].border,
+          borderTopColor: isDark ? '#001F1F' : Colors[theme].border,
           height: 85,
           paddingBottom: 25,
           paddingTop: 10,

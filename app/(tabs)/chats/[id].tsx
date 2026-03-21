@@ -15,11 +15,16 @@ import {
 import { getChatDetails, getMessages, sendMessage } from '../../../api/chats';
 import Colors from '../../../constants/Colors';
 import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function ChatDetailScreen() {
     const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
     const { user } = useAuth();
     const router = useRouter();
+    const { colorScheme } = useTheme();
+    const isDark = colorScheme === 'dark';
+    const themeColors = isDark ? Colors.dark : Colors.light;
+
     const [chat, setChat] = useState<any>(null);
     const [messages, setMessages] = useState<any[]>([]);
     const [inputText, setInputText] = useState('');
@@ -30,7 +35,6 @@ export default function ChatDetailScreen() {
     useEffect(() => {
         loadChatDetails();
         loadMessages();
-        // Optional: Poll for new messages every 5 seconds since we don't have WebSocket here yet
         const interval = setInterval(loadMessages, 5000);
         return () => clearInterval(interval);
     }, [id]);
@@ -47,10 +51,8 @@ export default function ChatDetailScreen() {
     async function loadMessages() {
         try {
             const response = await getMessages(id!);
-            // Backend returns messages in descending order (newest first)
-            // Reverse them to show newest at bottom of FlatList
-            const messages = response.data.messages || [];
-            setMessages([...messages].reverse());
+            const msgs = response.data.messages || [];
+            setMessages([...msgs].reverse());
         } catch (error) {
             console.error('Failed to load messages', error);
         } finally {
@@ -67,10 +69,9 @@ export default function ChatDetailScreen() {
 
         try {
             await sendMessage(id!, textToSend);
-            await loadMessages(); // Reload messages after sending
+            await loadMessages();
         } catch (error) {
             console.error('Failed to send message', error);
-            // Optionally restore input text or show alert
         } finally {
             setSending(false);
         }
@@ -80,7 +81,6 @@ export default function ChatDetailScreen() {
         const isMe = item.sender_user_id === user?.id || item.is_user_message;
         const isGroup = chat?.chat_type?.toLowerCase() === 'group';
 
-        // Find agent info if it's not me in a group chat
         let agentName = '';
         if (isGroup && !isMe) {
             const participant = chat?.participants?.find((p: any) => p.agent_id === item.sender_agent_id);
@@ -90,19 +90,19 @@ export default function ChatDetailScreen() {
         return (
             <View style={[styles.messageRow, isMe ? styles.myMessageRow : styles.theirMessageRow]}>
                 {isGroup && !isMe && (
-                    <View style={styles.senderAvatar}>
-                        <Bot size={16} color={Colors.light.tint} />
+                    <View style={[styles.senderAvatar, { backgroundColor: themeColors.secondary }]}>
+                        <Bot size={16} color={themeColors.tint} />
                     </View>
                 )}
                 <View style={[styles.messageBubbleContainer, isMe ? styles.myBubbleContainer : styles.theirBubbleContainer]}>
                     {isGroup && !isMe && (
-                        <Text style={styles.senderName}>{agentName}</Text>
+                        <Text style={[styles.senderName, { color: isDark ? '#B0BEC5' : '#546E7A' }]}>{agentName}</Text>
                     )}
-                    <View style={[styles.messageBubble, isMe ? styles.myBubble : styles.theirBubble]}>
-                        <Text style={[styles.messageText, isMe ? styles.myMessageText : styles.theirMessageText]}>
+                    <View style={[styles.messageBubble, isMe ? styles.myBubble : (isDark ? styles.theirBubbleDark : styles.theirBubble)]}>
+                        <Text style={[styles.messageText, isMe ? styles.myMessageText : (isDark ? styles.theirMessageTextDark : styles.theirMessageText)]}>
                             {item.content || item.text}
                         </Text>
-                        <Text style={styles.timestamp}>
+                        <Text style={[styles.timestamp, { color: isMe ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.4)' }]}>
                             {new Date(item.created_at || item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Text>
                     </View>
@@ -113,12 +113,11 @@ export default function ChatDetailScreen() {
 
     return (
         <KeyboardAvoidingView
-            style={styles.container}
+            style={[styles.container, { backgroundColor: themeColors.background }]}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
-            {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: isDark ? '#000B0B' : themeColors.tint }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <ArrowLeft color="#FFF" size={24} />
                 </TouchableOpacity>
@@ -130,12 +129,12 @@ export default function ChatDetailScreen() {
                         params: { id, title: title || chat?.title }
                     })}
                 >
-                    <View style={styles.headerAvatar}>
-                        <Bot size={20} color={Colors.light.tint} />
+                    <View style={[styles.headerAvatar, { backgroundColor: isDark ? '#002626' : '#FFF' }]}>
+                        <Bot size={20} color={themeColors.tint} />
                     </View>
                     <View style={styles.headerInfo}>
                         <Text style={styles.headerTitle} numberOfLines={1}>{title || chat?.title || 'Chat'}</Text>
-                        <Text style={styles.headerStatus}>
+                        <Text style={[styles.headerStatus, { color: isDark ? themeColors.tint : '#E0F2F1' }]}>
                             {chat?.chat_type === 'group'
                                 ? `${chat?.participants?.length || 0} members`
                                 : chat?.is_online ? 'Online' : 'Offline'
@@ -145,10 +144,9 @@ export default function ChatDetailScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Message List */}
             {loading ? (
                 <View style={styles.center}>
-                    <ActivityIndicator color={Colors.light.tint} />
+                    <ActivityIndicator color={themeColors.tint} />
                 </View>
             ) : (
                 <FlatList
@@ -162,18 +160,25 @@ export default function ChatDetailScreen() {
                 />
             )}
 
-            {/* Input Area */}
-            <View style={styles.inputArea}>
+            <View style={[styles.inputArea, { backgroundColor: isDark ? '#001A1A' : '#FFF', borderTopColor: isDark ? '#003333' : themeColors.border }]}>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={[styles.input, { maxHeight: 100 }]}
+                        style={[
+                            styles.input,
+                            {
+                                backgroundColor: isDark ? '#002626' : '#F5F5F5',
+                                color: themeColors.text,
+                                maxHeight: 100
+                            }
+                        ]}
                         placeholder="Type a message..."
+                        placeholderTextColor={isDark ? '#546E7A' : '#90A4AE'}
                         value={inputText}
                         onChangeText={setInputText}
                         multiline
                     />
                     <TouchableOpacity
-                        style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
+                        style={[styles.sendButton, { backgroundColor: themeColors.tint }, !inputText.trim() && (isDark ? styles.sendButtonDisabledDark : styles.sendButtonDisabled)]}
                         onPress={handleSend}
                         disabled={!inputText.trim() || sending}
                     >
@@ -192,7 +197,6 @@ export default function ChatDetailScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.light.background,
     },
     center: {
         flex: 1,
@@ -204,7 +208,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: Colors.light.tint,
         paddingBottom: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -225,7 +228,6 @@ const styles = StyleSheet.create({
     },
     headerStatus: {
         fontSize: 12,
-        color: '#E0F2F1', // Light shade for the status
     },
     headerInfoContainer: {
         flex: 1,
@@ -236,7 +238,6 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#FFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,
@@ -261,11 +262,15 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     myBubble: {
-        backgroundColor: Colors.light.tint,
+        backgroundColor: '#008B8B',
         borderBottomRightRadius: 2,
     },
     theirBubble: {
-        backgroundColor: Colors.light.secondary,
+        backgroundColor: '#E0F7FA',
+        borderBottomLeftRadius: 2,
+    },
+    theirBubbleDark: {
+        backgroundColor: '#003333',
         borderBottomLeftRadius: 2,
     },
     messageText: {
@@ -277,17 +282,17 @@ const styles = StyleSheet.create({
     theirMessageText: {
         color: '#000',
     },
+    theirMessageTextDark: {
+        color: '#FFFFFF',
+    },
     timestamp: {
         fontSize: 10,
-        color: 'rgba(0,0,0,0.4)',
         marginTop: 4,
         alignSelf: 'flex-end',
     },
     inputArea: {
         padding: 12,
-        backgroundColor: '#FFF',
         borderTopWidth: 1,
-        borderTopColor: Colors.light.border,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -296,30 +301,30 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
         borderRadius: 20,
         paddingHorizontal: 16,
         paddingVertical: 8,
         paddingTop: 8,
         fontSize: 16,
-        color: '#000',
     },
     sendButton: {
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: Colors.light.tint,
         justifyContent: 'center',
         alignItems: 'center',
     },
     sendButtonDisabled: {
         backgroundColor: '#B2DFDB',
     },
+    sendButtonDisabledDark: {
+        backgroundColor: '#004D40',
+        opacity: 0.5,
+    },
     senderAvatar: {
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: Colors.light.secondary,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 8,
@@ -338,7 +343,6 @@ const styles = StyleSheet.create({
     senderName: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#546E7A',
         marginLeft: 4,
         marginBottom: 2,
     },
