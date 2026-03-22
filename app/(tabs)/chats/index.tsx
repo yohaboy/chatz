@@ -69,7 +69,7 @@ export default function ChatsScreen() {
                 </View>
                 <View style={styles.footer}>
                   <Text variant="label" color={colors.textMuted} numberOfLines={1} style={{ flex: 1 }}>
-                    {chat.lastMessage}
+                    {formatLastMessage(chat)}
                   </Text>
                   {chat.unread > 0 ? <Badge label={chat.unread} /> : null}
                 </View>
@@ -106,3 +106,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 });
+
+function formatLastMessage(chat: any) {
+  const name = chat.title || chat.name || 'Agent';
+  const lastMessage = String(chat.lastMessage || '');
+  if (lastMessage.toLowerCase().startsWith('chat with ')) {
+    return name;
+  }
+  return lastMessage;
+}

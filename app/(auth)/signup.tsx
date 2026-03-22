@@ -87,12 +87,15 @@ export default function SignupScreen() {
     try {
       setLoading(true);
       const signupData = {
-        ...userInfo,
-        agent: {
-          templateId: selectedTemplate.id,
-          ...agentCustomization,
-          age: parseInt(agentCustomization.age),
-        },
+        email: userInfo.email,
+        password: userInfo.password,
+        google_id: null,
+        age: Number(userInfo.age),
+        gender: userInfo.gender,
+        selected_agent_id: selectedTemplate.id,
+        agent_name: agentCustomization.name,
+        agent_age: Number(agentCustomization.age),
+        agent_category: agentCustomization.personality,
       };
 
       const response = await register(signupData);
