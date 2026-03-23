@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
-import { Check, ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, View } from 'react-native';
 import { getAgentTemplates } from '../../api/agents';
 import { register } from '../../api/auth';
 import { Button } from '../../components/ui/Button';
@@ -11,6 +11,23 @@ import { Surface } from '../../components/ui/Surface';
 import { Text } from '../../components/ui/Text';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAuth } from '../../context/AuthContext';
+import alexImage from '../../assets/images/alex.jpg';
+import davidImage from '../../assets/images/david.jpg';
+import emmaImage from '../../assets/images/emma.jpg';
+import sarahImage from '../../assets/images/sarah.jpg';
+import sophiaImage from '../../assets/images/sophia.jpg';
+import reserveMaleImage from '../../assets/images/reserve_male.jpg';
+
+const agentImageMap: Record<string, any> = {
+  alex: alexImage,
+  david: davidImage,
+  emma: emmaImage,
+  sarah: sarahImage,
+  sophia: sophiaImage,
+  reserve_male: reserveMaleImage,
+};
+
+const fallbackAgentImage = reserveMaleImage;
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -86,6 +103,7 @@ export default function SignupScreen() {
   const handleFinish = async () => {
     try {
       setLoading(true);
+      const selectedImageKey = getTemplateImageKey(selectedTemplate?.name);
       const signupData = {
         email: userInfo.email,
         password: userInfo.password,
@@ -93,6 +111,7 @@ export default function SignupScreen() {
         age: Number(userInfo.age),
         gender: userInfo.gender,
         selected_agent_id: selectedTemplate.id,
+        selected_agent_image: selectedImageKey,
         agent_name: agentCustomization.name,
         agent_age: Number(agentCustomization.age),
         agent_category: agentCustomization.personality,
@@ -187,9 +206,10 @@ export default function SignupScreen() {
         </Text>
       </View>
 
-      <View style={{ gap: spacing.md }}>
+      <View style={styles.templateGrid}>
         {templates.map((t: any) => {
           const selected = selectedTemplate?.id === t.id;
+          const imageSource = getTemplateImageSource(t.name);
           return (
             <Pressable
               key={t.id}
@@ -203,11 +223,19 @@ export default function SignupScreen() {
                 },
               ]}
             >
-              <View style={{ flex: 1, gap: spacing.xs }}>
-                <Text variant="bodyStrong">{t.name}</Text>
-                <Text variant="label" color={colors.textMuted}>{t.description}</Text>
+              <View style={styles.templateCardContent}>
+                <View
+                  style={[
+                    styles.templateImageFrame,
+                    { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
+                  ]}
+                >
+                  <Image source={imageSource} style={styles.templateImage} />
+                </View>
+                <Text variant="bodyStrong" style={{ textAlign: 'center' }}>
+                  {t.name}
+                </Text>
               </View>
-              {selected ? <Check size={20} color={colors.tint} /> : null}
             </Pressable>
           );
         })}
@@ -334,11 +362,65 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   templateCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    width: '48%',
+    aspectRatio: 1,
+    padding: 12,
     borderRadius: 16,
     borderWidth: 1,
+    justifyContent: 'center',
+  },
+  templateGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
+  templateCardContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  templateImageFrame: {
+    width: '100%',
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  templateImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
 });
+
+function normalizeAgentKey(name?: string) {
+  if (!name) return null;
+  const raw = name.trim().toLowerCase();
+  if (!raw) return null;
+  const compact = raw.replace(/[^a-z0-9_]/g, '');
+  const firstToken = raw.split(/[^a-z0-9_]+/).filter(Boolean)[0];
+  return { raw, compact, firstToken };
+}
+
+function resolveAgentKey(name?: string) {
+  const normalized = normalizeAgentKey(name);
+  if (!normalized) return null;
+  if (normalized.raw.includes('alex')) return 'alex';
+  if (agentImageMap[normalized.raw]) return normalized.raw;
+  if (normalized.firstToken && agentImageMap[normalized.firstToken]) return normalized.firstToken;
+  if (agentImageMap[normalized.compact]) return normalized.compact;
+  return null;
+}
+
+function getTemplateImageKey(name?: string) {
+  const key = resolveAgentKey(name);
+  return key ? `${key}.jpg` : 'reserve_male.jpg';
+}
+
+function getTemplateImageSource(name?: string) {
+  const key = resolveAgentKey(name);
+  return (key && agentImageMap[key]) || fallbackAgentImage;
+}
