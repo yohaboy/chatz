@@ -24,7 +24,8 @@
       },
       "predictiveBackGestureEnabled": false,
       "experimental_edgeToEdge": true,
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "package": "com.yohaboy.chatz"
     },
     "androidStatusBar": {
       "backgroundColor": "#00000000",
@@ -47,6 +48,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8f23cdd9-eec0-4ca3-b3e0-55d145ae953b"
+      }
     }
   }
 }

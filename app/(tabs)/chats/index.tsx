@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronRight, MessageCircle } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { getChats } from '../../../api/chats';
 import { Avatar } from '../../../components/ui/Avatar';
 import { Badge } from '../../../components/ui/Badge';
@@ -10,6 +10,7 @@ import { Screen } from '../../../components/ui/Screen';
 import { Surface } from '../../../components/ui/Surface';
 import { Text } from '../../../components/ui/Text';
 import { useAppTheme } from '../../../hooks/useAppTheme';
+import { getAgentImageSource } from '../../../utils/agentImages';
 
 export default function ChatsScreen() {
   const [chats, setChats] = useState<any[]>([]);
@@ -47,6 +48,7 @@ export default function ChatsScreen() {
       <Surface style={{ marginTop: spacing.xl }} padded={false}>
         {chats.map((chat: any, index: number) => {
           const isLast = index === chats.length - 1;
+          const agentImage = getPersonalChatAgentImage(chat);
           return (
             <Pressable
               key={chat.id}
@@ -60,7 +62,7 @@ export default function ChatsScreen() {
               ]}
             >
               <Avatar size={52}>
-                <MessageCircle size={22} color={colors.tint} />
+                <Image source={agentImage} style={styles.avatarImage} />
               </Avatar>
               <View style={styles.info}>
                 <View style={styles.header}>
@@ -105,6 +107,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 999,
+  },
 });
 
 function formatLastMessage(chat: any) {
@@ -114,4 +121,23 @@ function formatLastMessage(chat: any) {
     return name;
   }
   return lastMessage;
+}
+
+function getPersonalChatAgentImage(chat: any) {
+  const imageKey =
+    chat?.selected_agent_image ||
+    chat?.agent_image ||
+    chat?.agent_avatar ||
+    chat?.agent_photo ||
+    chat?.image ||
+    chat?.photo ||
+    chat?.avatar ||
+    chat?.participants?.[0]?.agent_image ||
+    chat?.participants?.[0]?.agent_avatar;
+  const nameFallback =
+    chat?.participants?.[0]?.agent_name ||
+    chat?.agent_name ||
+    chat?.title ||
+    chat?.name;
+  return getAgentImageSource(imageKey, nameFallback);
 }

@@ -1,4 +1,3 @@
-import * as Google from 'expo-auth-session/providers/google';
 import { Link, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
@@ -9,8 +8,8 @@ import { Input } from '../../components/ui/Input';
 import { Screen } from '../../components/ui/Screen';
 import { Surface } from '../../components/ui/Surface';
 import { Text } from '../../components/ui/Text';
-import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAuth } from '../../context/AuthContext';
+import { useAppTheme } from '../../hooks/useAppTheme';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -22,9 +21,9 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [request, , promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-  });
+//  const [request, , promptAsync] = Google.useAuthRequest({
+//    clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+//  });
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -49,16 +48,16 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await promptAsync();
-      if (result.type === 'success') {
-        router.replace('/(tabs)');
-      }
-    } catch (error) {
-      Alert.alert('Google Login Failed', 'Could not authenticate with Google');
-    }
-  };
+//  const handleGoogleLogin = async () => {
+//    try {
+//      const result = await promptAsync();
+//      if (result.type === 'success') {
+//        router.replace('/(tabs)');
+//      }
+//    } catch (error) {
+//      Alert.alert('Google Login Failed', 'Could not authenticate with Google');
+//    }
+//  };
 
   return (
     <Screen scroll>
@@ -104,13 +103,6 @@ export default function LoginScreen() {
           </Text>
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
         </View>
-
-        <Button
-          title="Continue with Google"
-          onPress={handleGoogleLogin}
-          variant="secondary"
-          disabled={!request}
-        />
       </Surface>
 
       <View style={[styles.footer, { marginTop: spacing.xxl }]}> 

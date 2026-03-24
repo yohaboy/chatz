@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Bot, Calendar, Info, MessageSquare, User } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { getChatDetails } from '../../../api/chats';
 import { Avatar } from '../../../components/ui/Avatar';
 import { IconButton } from '../../../components/ui/IconButton';
@@ -9,6 +9,7 @@ import { Screen } from '../../../components/ui/Screen';
 import { Surface } from '../../../components/ui/Surface';
 import { Text } from '../../../components/ui/Text';
 import { useAppTheme } from '../../../hooks/useAppTheme';
+import { getAgentImageSource } from '../../../utils/agentImages';
 
 export default function ChatInfoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -56,7 +57,11 @@ export default function ChatInfoScreen() {
 
       <Surface style={{ marginTop: spacing.xl, alignItems: 'center' }}>
         <Avatar size={96}>
-          <Bot size={40} color={colors.tint} />
+          {isGroup ? (
+            <Bot size={40} color={colors.tint} />
+          ) : (
+            <Image source={getPersonalChatAgentImage(chat)} style={styles.avatarImage} />
+          )}
         </Avatar>
         <Text variant="headline" style={{ marginTop: spacing.md }}>
           {chat?.title || 'Chat'}
@@ -176,4 +181,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 999,
+  },
 });
+
+function getPersonalChatAgentImage(chat: any) {
+  const imageKey =
+    chat?.selected_agent_image ||
+    chat?.agent_image ||
+    chat?.agent_avatar ||
+    chat?.agent_photo ||
+    chat?.image ||
+    chat?.photo ||
+    chat?.avatar ||
+    chat?.participants?.[0]?.agent_image ||
+    chat?.participants?.[0]?.agent_avatar;
+  const nameFallback =
+    chat?.participants?.[0]?.agent_name ||
+    chat?.agent_name ||
+    chat?.title ||
+    chat?.name;
+  return getAgentImageSource(imageKey, nameFallback);
+}

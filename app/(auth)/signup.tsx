@@ -11,23 +11,7 @@ import { Surface } from '../../components/ui/Surface';
 import { Text } from '../../components/ui/Text';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAuth } from '../../context/AuthContext';
-import alexImage from '../../assets/images/alex.jpg';
-import davidImage from '../../assets/images/david.jpg';
-import emmaImage from '../../assets/images/emma.jpg';
-import sarahImage from '../../assets/images/sarah.jpg';
-import sophiaImage from '../../assets/images/sophia.jpg';
-import reserveMaleImage from '../../assets/images/reserve_male.jpg';
-
-const agentImageMap: Record<string, any> = {
-  alex: alexImage,
-  david: davidImage,
-  emma: emmaImage,
-  sarah: sarahImage,
-  sophia: sophiaImage,
-  reserve_male: reserveMaleImage,
-};
-
-const fallbackAgentImage = reserveMaleImage;
+import { getAgentImageKeyByName, getAgentImageSourceByName } from '../../utils/agentImages';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -103,7 +87,7 @@ export default function SignupScreen() {
   const handleFinish = async () => {
     try {
       setLoading(true);
-      const selectedImageKey = getTemplateImageKey(selectedTemplate?.name);
+      const selectedImageKey = getAgentImageKeyByName(selectedTemplate?.name);
       const signupData = {
         email: userInfo.email,
         password: userInfo.password,
@@ -209,7 +193,7 @@ export default function SignupScreen() {
       <View style={styles.templateGrid}>
         {templates.map((t: any) => {
           const selected = selectedTemplate?.id === t.id;
-          const imageSource = getTemplateImageSource(t.name);
+          const imageSource = getAgentImageSourceByName(t.name);
           return (
             <Pressable
               key={t.id}
@@ -395,32 +379,3 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
 });
-
-function normalizeAgentKey(name?: string) {
-  if (!name) return null;
-  const raw = name.trim().toLowerCase();
-  if (!raw) return null;
-  const compact = raw.replace(/[^a-z0-9_]/g, '');
-  const firstToken = raw.split(/[^a-z0-9_]+/).filter(Boolean)[0];
-  return { raw, compact, firstToken };
-}
-
-function resolveAgentKey(name?: string) {
-  const normalized = normalizeAgentKey(name);
-  if (!normalized) return null;
-  if (normalized.raw.includes('alex')) return 'alex';
-  if (agentImageMap[normalized.raw]) return normalized.raw;
-  if (normalized.firstToken && agentImageMap[normalized.firstToken]) return normalized.firstToken;
-  if (agentImageMap[normalized.compact]) return normalized.compact;
-  return null;
-}
-
-function getTemplateImageKey(name?: string) {
-  const key = resolveAgentKey(name);
-  return key ? `${key}.jpg` : 'reserve_male.jpg';
-}
-
-function getTemplateImageSource(name?: string) {
-  const key = resolveAgentKey(name);
-  return (key && agentImageMap[key]) || fallbackAgentImage;
-}

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -18,6 +19,7 @@ import { IconButton } from '../../../components/ui/IconButton';
 import { Text } from '../../../components/ui/Text';
 import { useAuth } from '../../../context/AuthContext';
 import { useAppTheme } from '../../../hooks/useAppTheme';
+import { getAgentImageSource } from '../../../utils/agentImages';
 
 export default function ChatDetailScreen() {
   const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
@@ -145,7 +147,11 @@ export default function ChatDetailScreen() {
           onPress={() => router.push({ pathname: '/chats/[id]/info', params: { id, title: title || chat?.title } })}
         >
           <Avatar size={40}>
-            <Bot size={18} color={colors.tint} />
+            {chat?.chat_type === 'group' ? (
+              <Bot size={18} color={colors.tint} />
+            ) : (
+              <Image source={getPersonalChatAgentImage(chat)} style={styles.avatarImage} />
+            )}
           </Avatar>
           <View style={{ flex: 1 }}>
             <Text variant="bodyStrong" numberOfLines={1}>{title || chat?.title || 'Chat'}</Text>
@@ -250,6 +256,11 @@ const styles = StyleSheet.create({
   agentAvatar: {
     marginRight: 4,
   },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 999,
+  },
   bubble: {
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -282,3 +293,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+function getPersonalChatAgentImage(chat: any) {
+  const imageKey =
+    chat?.selected_agent_image ||
+    chat?.agent_image ||
+    chat?.agent_avatar ||
+    chat?.agent_photo ||
+    chat?.image ||
+    chat?.photo ||
+    chat?.avatar ||
+    chat?.participants?.[0]?.agent_image ||
+    chat?.participants?.[0]?.agent_avatar;
+  const nameFallback =
+    chat?.participants?.[0]?.agent_name ||
+    chat?.agent_name ||
+    chat?.title ||
+    chat?.name;
+  return getAgentImageSource(imageKey, nameFallback);
+}
