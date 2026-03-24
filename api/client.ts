@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { storage } from '../utils/storage';
 
-const BASE_API_URL = process.env.EXPO_PUBLIC_BASE_API_URL || 'http://localhost:8000';
+const BASE_API_URL = "https://ipar-ai.onrender.com";
 
 const client = axios.create({
     baseURL: BASE_API_URL,

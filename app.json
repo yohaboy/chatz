@@ -25,7 +25,8 @@
       "predictiveBackGestureEnabled": false,
       "experimental_edgeToEdge": true,
       "softwareKeyboardLayoutMode": "resize",
-      "package": "com.yohaboy.chatz"
+      "package": "com.yohaboy.chatz",
+      "usesCleartextTraffic": true
     },
     "androidStatusBar": {
       "backgroundColor": "#00000000",
