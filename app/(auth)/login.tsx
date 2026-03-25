@@ -61,74 +61,72 @@ export default function LoginScreen() {
 
   return (
     <Screen scroll>
-      <View style={[styles.header, { marginBottom: spacing.xxl }]}> 
-        <View style={[styles.logo, { backgroundColor: colors.tint, borderRadius: radius.lg }]}>
-          <Text variant="headline" style={{ color: colors.surface, fontFamily: typography.fonts.bold }}>
-            CZ
+      <View style={styles.content}>
+        <View style={[styles.header, { marginBottom: spacing.xl, marginTop: spacing.xxl }]}> 
+          <Text variant="title" style={{ fontFamily: typography.fonts.semibold }}>Welcome back</Text>
+          <Text variant="body" color={colors.textMuted} style={{ marginTop: spacing.xs }}>
+            Sign in to keep the conversation going.
           </Text>
         </View>
-        <Text variant="title">Welcome back</Text>
-        <Text variant="body" color={colors.textMuted} style={{ marginTop: spacing.xs }}>
-          Sign in to keep the conversation going.
-        </Text>
-      </View>
 
-      <Surface style={{ gap: spacing.lg }}>
-        <Input
-          label="Email Address"
-          placeholder="you@email.com"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <Input
-          label="Password"
-          placeholder="********"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <Surface style={[styles.card, { gap: spacing.lg }]}>
+          <Input
+            label="Email Address"
+            placeholder="you@email.com"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <Input
+            label="Password"
+            placeholder="********"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-        <Pressable onPress={() => router.push('/(auth)/forgot-password')} style={{ alignSelf: 'flex-end' }}>
-          <Text variant="label" color={colors.tint}>Forgot password?</Text>
-        </Pressable>
-
-        <Button title={loading ? 'Signing in...' : 'Sign In'} onPress={handleLogin} loading={loading} />
-
-        <View style={styles.dividerRow}>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <Text variant="caption" color={colors.textMuted} style={{ marginHorizontal: spacing.md }}>
-            OR
-          </Text>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-        </View>
-      </Surface>
-
-      <View style={[styles.footer, { marginTop: spacing.xxl }]}> 
-        <Text variant="label" color={colors.textMuted}>Don't have an account?</Text>
-        <Link href="/(auth)/signup" asChild>
-          <Pressable>
-            <Text variant="label" color={colors.tint} style={{ marginLeft: spacing.xs }}>
-              Sign Up
-            </Text>
+          <Pressable onPress={() => router.push('/(auth)/forgot-password')} style={{ alignSelf: 'flex-end' }}>
+            <Text variant="label" color={colors.tint}>Forgot password?</Text>
           </Pressable>
-        </Link>
+
+          <Button title={loading ? 'Signing in...' : 'Sign In'} onPress={handleLogin} loading={loading} />
+
+          <View style={styles.dividerRow}>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <Text variant="caption" color={colors.textMuted} style={{ marginHorizontal: spacing.md }}>
+              OR
+            </Text>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          </View>
+        </Surface>
+
+        <View style={[styles.footer, { marginTop: spacing.xl }]}> 
+          <Text variant="label" color={colors.textMuted}>Don't have an account?</Text>
+          <Link href="/(auth)/signup" asChild>
+            <Pressable>
+              <Text variant="label" color={colors.tint} style={{ marginLeft: spacing.xs }}>
+                Sign Up
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    alignItems: 'center',
+  content: {
+    width: '100%',
+    maxWidth: 420,
+    alignSelf: 'center',
   },
-  logo: {
-    width: 64,
-    height: 64,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
+  header: {
+    alignItems: 'flex-start',
+  },
+  card: {
+    padding: 20,
   },
   dividerRow: {
     flexDirection: 'row',
