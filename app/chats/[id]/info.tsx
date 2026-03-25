@@ -9,7 +9,8 @@ import { Screen } from '../../../components/ui/Screen';
 import { Surface } from '../../../components/ui/Surface';
 import { Text } from '../../../components/ui/Text';
 import { useAppTheme } from '../../../hooks/useAppTheme';
-import { getAgentImageSource } from '../../../utils/agentImages';
+import { getAgentImageSource, getAgentImageSourceByName } from '../../../utils/agentImages';
+import { storage } from '../../../utils/storage';
 
 export default function ChatInfoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,9 +19,11 @@ export default function ChatInfoScreen() {
 
   const [chat, setChat] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [storedAgentImages, setStoredAgentImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadChatDetails();
+    loadStoredAgentImages();
   }, [id]);
 
   async function loadChatDetails() {
@@ -31,6 +34,16 @@ export default function ChatInfoScreen() {
       console.error('Failed to load chat details', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadStoredAgentImages() {
+    try {
+      const raw = await storage.getItem('agent_image_map');
+      setStoredAgentImages(raw ? JSON.parse(raw) : {});
+    } catch (error) {
+      console.error('Failed to load agent image map', error);
+      setStoredAgentImages({});
     }
   }
 
@@ -60,7 +73,7 @@ export default function ChatInfoScreen() {
           {isGroup ? (
             <Bot size={40} color={colors.tint} />
           ) : (
-            <Image source={getPersonalChatAgentImage(chat)} style={styles.avatarImage} />
+            <Image source={getPersonalChatAgentImage(chat, storedAgentImages)} style={styles.avatarImage} />
           )}
         </Avatar>
         <Text variant="headline" style={{ marginTop: spacing.md }}>
@@ -113,7 +126,7 @@ export default function ChatInfoScreen() {
             {chat?.participants?.map((p: any) => (
               <View key={p.id} style={styles.memberRow}>
                 <Avatar size={40}>
-                  <Bot size={18} color={colors.tint} />
+                  <Image source={getAgentImageSourceByName(p.agent_name)} style={styles.avatarImage} />
                 </Avatar>
                 <View style={{ flex: 1 }}>
                   <Text variant="bodyStrong">{p.agent_name}</Text>
@@ -188,8 +201,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function getPersonalChatAgentImage(chat: any) {
+function getPersonalChatAgentImage(chat: any, storedAgentImages: Record<string, string>) {
+  const agentId =
+    chat?.participants?.[0]?.agent_id ||
+    chat?.agent_id ||
+    chat?.selected_agent_id;
+  const storedKey = agentId ? storedAgentImages?.[agentId] : null;
   const imageKey =
+    storedKey ||
     chat?.selected_agent_image ||
     chat?.agent_image ||
     chat?.agent_avatar ||

@@ -12,6 +12,7 @@ import { Text } from '../../components/ui/Text';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAuth } from '../../context/AuthContext';
 import { getAgentImageKeyByName, getAgentImageSourceByName } from '../../utils/agentImages';
+import { storage } from '../../utils/storage';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -104,6 +105,7 @@ export default function SignupScreen() {
       const response = await register(signupData);
       const { access_token } = response.data;
       if (access_token) {
+        await persistSelectedAgentImage(selectedTemplate?.id, selectedImageKey);
         await signIn(access_token);
         router.replace('/(tabs)');
       } else {
@@ -319,6 +321,14 @@ export default function SignupScreen() {
       </Surface>
     </Screen>
   );
+}
+
+async function persistSelectedAgentImage(agentId?: string, imageKey?: string) {
+  if (!agentId || !imageKey) return;
+  const raw = await storage.getItem('agent_image_map');
+  const current = raw ? JSON.parse(raw) : {};
+  const updated = { ...current, [agentId]: imageKey };
+  await storage.setItem('agent_image_map', JSON.stringify(updated));
 }
 
 const styles = StyleSheet.create({

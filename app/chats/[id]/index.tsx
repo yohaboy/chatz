@@ -20,7 +20,8 @@ import { IconButton } from '../../../components/ui/IconButton';
 import { Text } from '../../../components/ui/Text';
 import { useAuth } from '../../../context/AuthContext';
 import { useAppTheme } from '../../../hooks/useAppTheme';
-import { getAgentImageSource } from '../../../utils/agentImages';
+import { getAgentImageSource, getAgentImageSourceByName } from '../../../utils/agentImages';
+import { storage } from '../../../utils/storage';
 
 export default function ChatDetailScreen() {
   const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
@@ -35,6 +36,7 @@ export default function ChatDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [storedAgentImages, setStoredAgentImages] = useState<Record<string, string>>({});
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -43,6 +45,10 @@ export default function ChatDetailScreen() {
     const interval = setInterval(loadMessages, 5000);
     return () => clearInterval(interval);
   }, [id]);
+
+  useEffect(() => {
+    loadStoredAgentImages();
+  }, []);
 
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
@@ -71,6 +77,16 @@ export default function ChatDetailScreen() {
       console.error('Failed to load messages', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadStoredAgentImages() {
+    try {
+      const raw = await storage.getItem('agent_image_map');
+      setStoredAgentImages(raw ? JSON.parse(raw) : {});
+    } catch (error) {
+      console.error('Failed to load agent image map', error);
+      setStoredAgentImages({});
     }
   }
 
@@ -105,7 +121,7 @@ export default function ChatDetailScreen() {
       <View style={[styles.messageRow, isMe ? styles.myRow : styles.theirRow]}>
         {isGroup && !isMe ? (
           <Avatar size={34} style={styles.agentAvatar}>
-            <Bot size={16} color={colors.tint} />
+            <Image source={getGroupAgentImage(item, chat)} style={styles.avatarImage} />
           </Avatar>
         ) : null}
         <View style={[styles.bubbleWrap, isMe ? styles.myWrap : styles.theirWrap]}>
@@ -167,7 +183,7 @@ export default function ChatDetailScreen() {
             {chat?.chat_type === 'group' ? (
               <Bot size={18} color={colors.tint} />
             ) : (
-              <Image source={getPersonalChatAgentImage(chat)} style={styles.avatarImage} />
+              <Image source={getPersonalChatAgentImage(chat, storedAgentImages)} style={styles.avatarImage} />
             )}
           </Avatar>
           <View style={{ flex: 1 }}>
@@ -320,8 +336,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function getPersonalChatAgentImage(chat: any) {
+function getPersonalChatAgentImage(chat: any, storedAgentImages: Record<string, string>) {
+  const agentId =
+    chat?.participants?.[0]?.agent_id ||
+    chat?.agent_id ||
+    chat?.selected_agent_id;
+  const storedKey = agentId ? storedAgentImages?.[agentId] : null;
   const imageKey =
+    storedKey ||
     chat?.selected_agent_image ||
     chat?.agent_image ||
     chat?.agent_avatar ||
@@ -337,4 +359,10 @@ function getPersonalChatAgentImage(chat: any) {
     chat?.title ||
     chat?.name;
   return getAgentImageSource(imageKey, nameFallback);
+}
+
+function getGroupAgentImage(message: any, chat: any) {
+  const participant = chat?.participants?.find((p: any) => p.agent_id === message?.sender_agent_id);
+  const nameFallback = participant?.agent_name || message?.sender_name || 'Agent';
+  return getAgentImageSourceByName(nameFallback);
 }

@@ -11,14 +11,17 @@ import { Surface } from '../../../components/ui/Surface';
 import { Text } from '../../../components/ui/Text';
 import { useAppTheme } from '../../../hooks/useAppTheme';
 import { getAgentImageSource } from '../../../utils/agentImages';
+import { storage } from '../../../utils/storage';
 
 export default function ChatsScreen() {
   const [chats, setChats] = useState<any[]>([]);
+  const [storedAgentImages, setStoredAgentImages] = useState<Record<string, string>>({});
   const router = useRouter();
   const { colors, spacing } = useAppTheme();
 
   useEffect(() => {
     loadChats();
+    loadStoredAgentImages();
   }, []);
 
   async function loadChats() {
@@ -31,6 +34,16 @@ export default function ChatsScreen() {
         { id: '1', name: 'Zia Chat', lastMessage: 'How are you today?', time: '10:45 AM', unread: 2, chat_type: 'personal' },
         { id: '2', name: 'Alex Bot', lastMessage: 'I understand.', time: 'Yesterday', unread: 0, chat_type: 'personal' },
       ]);
+    }
+  }
+
+  async function loadStoredAgentImages() {
+    try {
+      const raw = await storage.getItem('agent_image_map');
+      setStoredAgentImages(raw ? JSON.parse(raw) : {});
+    } catch (error) {
+      console.error('Failed to load agent image map', error);
+      setStoredAgentImages({});
     }
   }
 
@@ -48,7 +61,7 @@ export default function ChatsScreen() {
       <Surface style={{ marginTop: spacing.xl }} padded={false}>
         {chats.map((chat: any, index: number) => {
           const isLast = index === chats.length - 1;
-          const agentImage = getPersonalChatAgentImage(chat);
+          const agentImage = getPersonalChatAgentImage(chat, storedAgentImages);
           return (
             <Pressable
               key={chat.id}
@@ -123,8 +136,14 @@ function formatLastMessage(chat: any) {
   return lastMessage;
 }
 
-function getPersonalChatAgentImage(chat: any) {
+function getPersonalChatAgentImage(chat: any, storedAgentImages: Record<string, string>) {
+  const agentId =
+    chat?.participants?.[0]?.agent_id ||
+    chat?.agent_id ||
+    chat?.selected_agent_id;
+  const storedKey = agentId ? storedAgentImages?.[agentId] : null;
   const imageKey =
+    storedKey ||
     chat?.selected_agent_image ||
     chat?.agent_image ||
     chat?.agent_avatar ||
