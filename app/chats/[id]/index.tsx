@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -33,6 +34,7 @@ export default function ChatDetailScreen() {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -41,6 +43,15 @@ export default function ChatDetailScreen() {
     const interval = setInterval(loadMessages, 5000);
     return () => clearInterval(interval);
   }, [id]);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   async function loadChatDetails() {
     try {
@@ -134,8 +145,14 @@ export default function ChatDetailScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={insets.top}
+      behavior={
+        keyboardVisible
+          ? Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+          : undefined
+      }
+      keyboardVerticalOffset={keyboardVisible ? (Platform.OS === 'ios' ? insets.top : 0) : 0}
     >
       <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.surface, paddingTop: insets.top + spacing.sm }]}> 
         <IconButton onPress={() => router.back()} variant="soft">
@@ -180,7 +197,16 @@ export default function ChatDetailScreen() {
         />
       )}
 
-      <View style={[styles.inputArea, { borderTopColor: colors.border, backgroundColor: colors.surface, paddingBottom: insets.bottom + spacing.md }]}> 
+      <View
+        style={[
+          styles.inputArea,
+          {
+            borderTopColor: colors.border,
+            backgroundColor: colors.surface,
+            paddingBottom: keyboardVisible ? spacing.sm : insets.bottom + spacing.md,
+          },
+        ]}
+      >
         <View style={[styles.inputContainer, { backgroundColor: colors.surfaceAlt, borderRadius: radius.lg, borderColor: colors.border }]}> 
           <TextInput
             style={[styles.input, { color: colors.text, fontFamily: typography.fonts.regular }]}
