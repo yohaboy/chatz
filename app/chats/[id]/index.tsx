@@ -342,8 +342,12 @@ function getPersonalChatAgentImage(chat: any, storedAgentImages: Record<string, 
     chat?.agent_id ||
     chat?.selected_agent_id;
   const storedKey = agentId ? storedAgentImages?.[agentId] : null;
+  const nameKey =
+    `name:${(chat?.participants?.[0]?.agent_name || chat?.agent_name || chat?.title || chat?.name || '').trim().toLowerCase()}`;
+  const storedByName = storedAgentImages?.[nameKey] || null;
   const imageKey =
     storedKey ||
+    storedByName ||
     chat?.selected_agent_image ||
     chat?.agent_image ||
     chat?.agent_avatar ||

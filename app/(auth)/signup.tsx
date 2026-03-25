@@ -105,7 +105,7 @@ export default function SignupScreen() {
       const response = await register(signupData);
       const { access_token } = response.data;
       if (access_token) {
-        await persistSelectedAgentImage(selectedTemplate?.id, selectedImageKey);
+        await persistSelectedAgentImage(selectedTemplate?.id, agentCustomization.name, selectedImageKey);
         await signIn(access_token);
         router.replace('/(tabs)');
       } else {
@@ -323,11 +323,17 @@ export default function SignupScreen() {
   );
 }
 
-async function persistSelectedAgentImage(agentId?: string, imageKey?: string) {
-  if (!agentId || !imageKey) return;
+async function persistSelectedAgentImage(agentId?: string, agentName?: string, imageKey?: string) {
+  if (!imageKey) return;
   const raw = await storage.getItem('agent_image_map');
   const current = raw ? JSON.parse(raw) : {};
-  const updated = { ...current, [agentId]: imageKey };
+  const updated: Record<string, string> = { ...current };
+  if (agentId) {
+    updated[agentId] = imageKey;
+  }
+  if (agentName) {
+    updated[`name:${agentName.trim().toLowerCase()}`] = imageKey;
+  }
   await storage.setItem('agent_image_map', JSON.stringify(updated));
 }
 
