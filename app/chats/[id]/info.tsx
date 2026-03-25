@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Bot, Calendar, Info, MessageSquare, User } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { getAgentPresence } from '../../../api/agents';
 import { getChatDetails } from '../../../api/chats';
 import { Avatar } from '../../../components/ui/Avatar';
 import { IconButton } from '../../../components/ui/IconButton';
@@ -20,6 +21,7 @@ export default function ChatInfoScreen() {
   const [chat, setChat] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [storedAgentImages, setStoredAgentImages] = useState<Record<string, string>>({});
+  const [presenceByAgentId, setPresenceByAgentId] = useState<Record<string, { is_online?: boolean; last_seen?: string }>>({});
 
   useEffect(() => {
     loadChatDetails();
@@ -29,7 +31,9 @@ export default function ChatInfoScreen() {
   async function loadChatDetails() {
     try {
       const response = await getChatDetails(id!);
-      setChat(response.data);
+      const chatData = response.data;
+      setChat(chatData);
+      await loadPresenceMap(chatData);
     } catch (error) {
       console.error('Failed to load chat details', error);
     } finally {
@@ -44,6 +48,34 @@ export default function ChatInfoScreen() {
     } catch (error) {
       console.error('Failed to load agent image map', error);
       setStoredAgentImages({});
+    }
+  }
+
+  async function loadPresenceMap(chatData: any) {
+    if (!chatData || chatData?.chat_type?.toLowerCase() !== 'group') {
+      setPresenceByAgentId({});
+      return;
+    }
+    const agentIds = (chatData?.participants || [])
+      .map((p: any) => p?.agent_id)
+      .filter(Boolean);
+    const uniqueIds = Array.from(new Set(agentIds));
+    if (uniqueIds.length === 0) {
+      setPresenceByAgentId({});
+      return;
+    }
+    try {
+      const results = await Promise.allSettled(uniqueIds.map((agentId) => getAgentPresence(agentId)));
+      const nextMap: Record<string, { is_online?: boolean; last_seen?: string }> = {};
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          nextMap[uniqueIds[index]] = result.value.data;
+        }
+      });
+      setPresenceByAgentId(nextMap);
+    } catch (error) {
+      console.error('Failed to load presence map', error);
+      setPresenceByAgentId({});
     }
   }
 
@@ -130,8 +162,8 @@ export default function ChatInfoScreen() {
                 </Avatar>
                 <View style={{ flex: 1 }}>
                   <Text variant="bodyStrong">{p.agent_name}</Text>
-                  <Text variant="caption" color={p.is_online ? colors.success : colors.warning}>
-                    {p.is_online ? 'online' : 'away'}
+                  <Text variant="caption" color={presenceByAgentId?.[p.agent_id]?.is_online ? colors.success : colors.warning}>
+                    {formatPresenceLabel(presenceByAgentId?.[p.agent_id] || null)}
                   </Text>
                 </View>
               </View>
@@ -228,4 +260,20 @@ function getPersonalChatAgentImage(chat: any, storedAgentImages: Record<string, 
     chat?.title ||
     chat?.name;
   return getAgentImageSource(imageKey, nameFallback);
+}
+
+function formatPresenceLabel(presence: { is_online?: boolean; last_seen?: string } | null) {
+  if (!presence) return 'Offline';
+  if (presence.is_online) return 'Online';
+  const lastSeen = formatLastSeenTime(presence.last_seen);
+  return lastSeen ? `Last seen at ${lastSeen}` : 'Offline';
+}
+
+function formatLastSeenTime(lastSeen?: string) {
+  if (!lastSeen) return null;
+  const parsed = new Date(lastSeen);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed
+    .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLowerCase();
 }

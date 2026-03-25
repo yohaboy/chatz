@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getAgentPresence } from '../../../api/agents';
 import { getChatDetails, getMessages, sendMessage } from '../../../api/chats';
 import { Avatar } from '../../../components/ui/Avatar';
 import { IconButton } from '../../../components/ui/IconButton';
@@ -37,6 +38,7 @@ export default function ChatDetailScreen() {
   const [sending, setSending] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [storedAgentImages, setStoredAgentImages] = useState<Record<string, string>>({});
+  const [presence, setPresence] = useState<{ is_online: boolean; last_seen?: string } | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -62,7 +64,9 @@ export default function ChatDetailScreen() {
   async function loadChatDetails() {
     try {
       const response = await getChatDetails(id!);
-      setChat(response.data);
+      const chatData = response.data;
+      setChat(chatData);
+      await loadPresence(chatData);
     } catch (error) {
       console.error('Failed to load chat details', error);
     }
@@ -87,6 +91,28 @@ export default function ChatDetailScreen() {
     } catch (error) {
       console.error('Failed to load agent image map', error);
       setStoredAgentImages({});
+    }
+  }
+
+  async function loadPresence(chatData: any) {
+    if (!chatData || chatData?.chat_type?.toLowerCase() === 'group') {
+      setPresence(null);
+      return;
+    }
+    const agentId =
+      chatData?.participants?.[0]?.agent_id ||
+      chatData?.agent_id ||
+      chatData?.selected_agent_id;
+    if (!agentId) {
+      setPresence(null);
+      return;
+    }
+    try {
+      const response = await getAgentPresence(agentId);
+      setPresence(response.data);
+    } catch (error) {
+      console.error('Failed to load agent presence', error);
+      setPresence(null);
     }
   }
 
@@ -171,8 +197,8 @@ export default function ChatDetailScreen() {
       keyboardVerticalOffset={keyboardVisible ? (Platform.OS === 'ios' ? insets.top : 0) : 0}
     >
       <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.surface, paddingTop: insets.top + spacing.sm }]}> 
-        <IconButton onPress={() => router.back()} variant="soft">
-          <ArrowLeft color={colors.text} size={20} />
+        <IconButton onPress={() => router.back()} variant="ghost">
+          <ArrowLeft color={colors.text} size={24} />
         </IconButton>
 
         <Pressable
@@ -191,7 +217,7 @@ export default function ChatDetailScreen() {
             <Text variant="caption" color={colors.textMuted}>
               {chat?.chat_type === 'group'
                 ? `${chat?.participants?.length || 0} members`
-                : chat?.is_online ? 'Online' : 'Offline'}
+                : formatPresenceLabel(presence)}
             </Text>
           </View>
         </Pressable>
@@ -369,4 +395,20 @@ function getGroupAgentImage(message: any, chat: any) {
   const participant = chat?.participants?.find((p: any) => p.agent_id === message?.sender_agent_id);
   const nameFallback = participant?.agent_name || message?.sender_name || 'Agent';
   return getAgentImageSourceByName(nameFallback);
+}
+
+function formatPresenceLabel(presence: { is_online?: boolean; last_seen?: string } | null) {
+  if (!presence) return 'Offline';
+  if (presence.is_online) return 'Online';
+  const lastSeen = formatLastSeenTime(presence.last_seen);
+  return lastSeen ? `Last seen at ${lastSeen}` : 'Offline';
+}
+
+function formatLastSeenTime(lastSeen?: string) {
+  if (!lastSeen) return null;
+  const parsed = new Date(lastSeen);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed
+    .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLowerCase();
 }
